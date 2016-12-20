@@ -5,5 +5,5 @@ package datamodel;
  */
 public interface IWord {
     String getLemma();
-    // todo add IMorphProperties getProperties();
+    IMorphProperties getProperties();
 }
