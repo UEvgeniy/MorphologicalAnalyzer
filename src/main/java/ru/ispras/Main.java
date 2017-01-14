@@ -1,19 +1,10 @@
 package ru.ispras;
 
-import analyzers.IMorphAnalyzer;
-import factories.CompositeMorphAnalyzerFactory;
-import factories.IMorphAnalyzerFactory;
-import factories.MorphAnalyzerLoader;
-import factories.MorphAnalyzerSaver;
-
-import java.io.IOException;
-import java.nio.file.Paths;
-
 public class Main {
 
     public static void main(String[] args) {
 
-        factoriesUseExamples();
+
 
 
         // 2a. Find lemma + properties of the word from dictionary
@@ -24,12 +15,12 @@ public class Main {
     }
 
 
-    private static void factoriesUseExamples() {
+    /*private static void factoriesUseExamples() {
 
         String word = "Something";
 
         // 1a. Factory for loading dictionary of words from file and training model
-        IMorphAnalyzerFactory factory = new CompositeMorphAnalyzerFactory("Dictionary was loaded and analyzer was trained only");
+        IMorphAnalyzerFactory factory = new CompositeMorphAnalyzerFactory();
         IMorphAnalyzer analyzer = factory.create();
         analyzer.analyze(word); // for testing only, for now we don't need returning Collection
 
@@ -37,7 +28,7 @@ public class Main {
         String path = "D://analyzer.out";
 
         // 1b. Factory for saving analyzer...
-        factory = new CompositeMorphAnalyzerFactory("Dictionary was loaded and analyzer was trained and saved on " + path);
+        factory = new CompositeMorphAnalyzerFactory();
         try {
             MorphAnalyzerSaver saver = new MorphAnalyzerSaver(factory, Paths.get(path));
             analyzer = saver.create();
@@ -57,5 +48,6 @@ public class Main {
             System.out.println(e.getMessage());
         }
     }
+    */
 }
 

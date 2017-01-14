@@ -3,6 +3,7 @@ package factories;
 
 import analyzers.IMorphAnalyzer;
 
+import java.io.Closeable;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -12,7 +13,7 @@ import java.nio.file.Path;
 /**
  *  Class loads instance of classes IMorphAnalyzer
  */
-public class MorphAnalyzerLoader implements IMorphAnalyzerFactory{
+public class MorphAnalyzerLoader implements IMorphAnalyzerFactory, Closeable{
 
     private final ObjectInputStream ois;
 
@@ -38,5 +39,10 @@ public class MorphAnalyzerLoader implements IMorphAnalyzerFactory{
         catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+
+    public void close() throws IOException {
+        ois.close();
     }
 }
