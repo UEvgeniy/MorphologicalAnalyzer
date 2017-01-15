@@ -26,21 +26,13 @@ public class MorphAnalyzerLoader implements IMorphAnalyzerFactory, Closeable{
     public IMorphAnalyzer create() {
 
         try {
-            IMorphAnalyzer analyzer =  (IMorphAnalyzer) ois.readObject();
-
-            // todo remove log
-            System.out.println("Analyzer was successfully loaded...");
-
-            return analyzer;
+            return (IMorphAnalyzer) ois.readObject();
         }
-        catch (ClassNotFoundException e) {
+        catch (IOException | ClassNotFoundException e) {
             throw new RuntimeException(e);
         }
-        catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+
     }
-
 
     public void close() throws IOException {
         ois.close();
