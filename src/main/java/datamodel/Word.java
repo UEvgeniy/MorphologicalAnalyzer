@@ -26,4 +26,13 @@ public class Word implements IWord {
     public String toString() {
         return word;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+
+        return (obj.getClass() == Word.class)
+                && (obj.toString().equals(this.toString()))
+                && ((Word) obj).getLemma().equals(this.getLemma())
+                && ((Word) obj).getProperties().equals(this.getProperties());
+    }
 }

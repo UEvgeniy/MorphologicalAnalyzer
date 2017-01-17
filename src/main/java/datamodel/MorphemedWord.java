@@ -7,13 +7,25 @@ import java.util.List;
  */
 public class MorphemedWord {
 
+    private List<IMorpheme> morphemes;
+
+    public MorphemedWord(List<IMorpheme> morphemes){
+        this.morphemes = morphemes;
+    }
+
+
+    // todo replace this to toString() method (like IWord realization)
     public String getWord(){
-        // todo
-        return null;
+        String word = "";
+
+        for (IMorpheme m : morphemes){
+            word = word.concat(m.getText());
+        }
+
+        return word;
     }
 
     public List<IMorpheme> getMorphemes(){
-        // todo
-        return null;
+        return morphemes;
     }
 }

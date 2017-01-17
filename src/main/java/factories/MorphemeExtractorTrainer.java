@@ -4,6 +4,7 @@ package factories;
 import analyzers.MorphemeExtractor;
 import datamodel.IMorpheme;
 import datamodel.IWord;
+import datamodel.Morpheme;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -30,10 +31,32 @@ public class MorphemeExtractorTrainer {
 
         List<IMorpheme> morphemes = new ArrayList<>();
 
-        // todo Machine Learning
 
         for (IWord word : dictionary){
 
+            String w = word.toString(), lemma = word.getLemma();
+
+            // the similar way of extracting morphemes as in TrivialLemmaRulePropertyPredictorTrainer
+
+            // Morpheme here is unique substring for lemma
+
+            // todo Warning! copy-paste
+            short i = 0;
+
+            while (i < Math.min(w.length(), lemma.length())){
+                if (w.charAt(i) == lemma.charAt(i))
+                    i++;
+                else
+                    break;
+            }
+
+            Morpheme newMorph = new Morpheme(w.substring(i, w.length()));
+
+            if (i != w.length() && !morphemes.contains(newMorph)) {
+                morphemes.add(
+                        newMorph
+                );
+            }
         }
 
 

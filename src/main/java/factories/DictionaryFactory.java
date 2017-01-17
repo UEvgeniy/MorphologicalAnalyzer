@@ -5,10 +5,7 @@ import analyzers.IMorphAnalyzer;
 import datamodel.IWord;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 
 /**
  * Class forms dictionary from texts, saves it and creates DictionaryMorphAnalyzer instance.

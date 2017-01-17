@@ -50,7 +50,7 @@ public class MorphAnalyzerTrainer implements IMorphAnalyzerFactory{
         HashSet<IWord> words = parser.getDictionary();
 
         IPropertyPredictorFactory propertyPredictorFactory =
-                new LemmaRulePropertyPredictorTrainer();
+                new TrivialLemmaRulePropertyPredictorTrainer(words);
 
         MorphemeExtractorTrainer morphemeExtractorTrainer = new MorphemeExtractorTrainer(words);
 

@@ -1,6 +1,7 @@
 package analyzers;
 
 import datamodel.ILemmaRule;
+import datamodel.IWord;
 import datamodel.MorphemedWord;
 
 import java.util.Collection;
@@ -10,4 +11,5 @@ import java.util.Collection;
  */
 public interface IPropertyPredictor {
     Collection<ILemmaRule> predict(MorphemedWord word);
+    IWord apply(MorphemedWord mWord, ILemmaRule rule);
 }

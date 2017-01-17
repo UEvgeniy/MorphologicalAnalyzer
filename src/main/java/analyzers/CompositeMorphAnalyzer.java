@@ -34,6 +34,10 @@ public class CompositeMorphAnalyzer implements IMorphAnalyzer {
 
     public Collection<IWord> analyze (String word) {
 
+        if (word == null){
+            return null;
+        }
+
         // Use the first analyzer which is able to analyze the word
         for (IMorphAnalyzer an : analyzers) {
             if (an.canHandle(word)){
@@ -49,6 +53,12 @@ public class CompositeMorphAnalyzer implements IMorphAnalyzer {
 
 
     public Boolean canHandle(String word) {
+
+        // todo add - symbol to RegExp
+        if (word == null || !word.matches("^[а-я|А-Я]+$")){
+            return false;
+        }
+
         for (IMorphAnalyzer an : analyzers) {
             if (an.canHandle(word)){
                 return true;

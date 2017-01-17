@@ -21,8 +21,10 @@ public class Main {
         final File saveTo = new File("D://analyzer.nlzr");
 
         // Can analyze only words with an even word length and define lemma and properties as 42
-        IMorphAnalyzerFactory fact42 = veryPlainAnalyzer();
+        //IMorphAnalyzerFactory fact42 = veryPlainAnalyzer();
 
+        // Baseline implementation of Morpheme Extractor and Property Predictor
+        IMorphAnalyzerFactory mbma = new MorphAnalyzerTrainer(dict);
 
         try {
 
@@ -36,16 +38,18 @@ public class Main {
 
             // Order of arguments in constructor is IMPORTANT!
             // Swap arguments and analyzer behavior may be changed.
-            CompositeMorphAnalyzerFactory comp = new CompositeMorphAnalyzerFactory(fact42, loader);
+            CompositeMorphAnalyzerFactory comp = new CompositeMorphAnalyzerFactory(loader, mbma);
 
             IMorphAnalyzer analyzer = comp.create();
 
             // Recommended to add words with odd/even length and also words from parsed dictionary
-            tryAnalyze(analyzer, "и");
-            tryAnalyze(analyzer, "делал");
-            tryAnalyze(analyzer, "менять");
-            tryAnalyze(analyzer, "стимулом");
-            tryAnalyze(analyzer, "что");
+            tryAnalyze(analyzer, "и");         // dictionary analyzer
+            tryAnalyze(analyzer, "колобки");   // MorphemeBasedAnalyzer
+            tryAnalyze(analyzer, "делал");     // MorphemeBasedAnalyzer
+            tryAnalyze(analyzer, "скрывающееся");// MorphemeBasedAnalyzer
+            tryAnalyze(analyzer, "менять");    //
+            tryAnalyze(analyzer, "стимулом");  // dictionary analyzer
+            tryAnalyze(analyzer, "что");       // dictionary analyzer
 
         } catch (IOException e) {
             System.out.print(e.getMessage());
@@ -56,11 +60,14 @@ public class Main {
 
     private static void tryAnalyze(IMorphAnalyzer an, String word){
         if (an.canHandle(word)) {
-            IWord w = an.analyze(word).iterator().next();
-            System.out.println("WORD: " + w.toString() + " LEMMA: " + w.getLemma() + " PROPS: " + w.getProperties() );
+            Collection<IWord> words = an.analyze(word);
+            System.out.println("WORD: " + word);
+            for (IWord w : words){
+                System.out.println("\tLEMMA: " + w.getLemma() + "\tPROPS: " + w.getProperties());
+            }
         }
         else{
-            System.out.println("Word " + word + " cannot be analyzed");
+            System.out.println("Word " + word + "\n\tcannot be analyzed");
         }
     }
 
@@ -83,4 +90,3 @@ public class Main {
     }
 
 }
-

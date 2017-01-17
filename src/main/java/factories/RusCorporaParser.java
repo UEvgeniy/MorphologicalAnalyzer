@@ -40,9 +40,12 @@ class RusCorporaParser {
         HashSet<IWord> words = new HashSet<>();
 
         for (File f : files) {
-            words.addAll(
-                    extractWords(f)
-            );
+            Collection<IWord> fromFile = extractWords(f);
+            for (IWord word : fromFile){
+                if (!words.contains(word)){
+                    words.add(word);
+                }
+            }
         }
 
         return words;
@@ -125,7 +128,7 @@ class RusCorporaParser {
     private void tryAddWord(Collection<IWord> words, String line){
 
         IWord word = parse(line);
-        if (word != null){
+        if (word != null && !words.contains(word)){
             words.add(word);
         }
 
