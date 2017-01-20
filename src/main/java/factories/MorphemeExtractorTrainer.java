@@ -1,21 +1,22 @@
 package factories;
 
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import analyzers.MorphemeExtractor;
 import datamodel.IMorpheme;
 import datamodel.IWord;
 import datamodel.Morpheme;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.stream.Collectors;
-
 public class MorphemeExtractorTrainer {
 
-    private HashSet<IWord> dictionary;
+    private Set<IWord> dictionary;
 
-    public MorphemeExtractorTrainer(HashSet<IWord> words) {
+    public MorphemeExtractorTrainer(Set<IWord> words) {
 
         dictionary = new HashSet<>();
 
@@ -29,7 +30,7 @@ public class MorphemeExtractorTrainer {
 
     public MorphemeExtractor train(){
 
-        List<IMorpheme> morphemes = new ArrayList<>();
+        Set<IMorpheme> morphemes = new HashSet<>();
 
 
         for (IWord word : dictionary){
@@ -41,14 +42,7 @@ public class MorphemeExtractorTrainer {
             // Morpheme here is unique substring for lemma
 
             // todo Warning! copy-paste
-            short i = 0;
-
-            while (i < Math.min(w.length(), lemma.length())){
-                if (w.charAt(i) == lemma.charAt(i))
-                    i++;
-                else
-                    break;
-            }
+            short i = SuffixesHelper.getCommonPrefixLength(w, lemma);
 
             Morpheme newMorph = new Morpheme(w.substring(i, w.length()));
 
@@ -62,6 +56,8 @@ public class MorphemeExtractorTrainer {
 
         return new MorphemeExtractor(morphemes);
     }
+
+	
 
 
 }

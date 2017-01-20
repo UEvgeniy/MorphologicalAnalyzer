@@ -1,29 +1,26 @@
 package analyzers;
 
 
-import datamodel.IWord;
-
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
+
+import datamodel.IWord;
 
 /**
  * Morphological analyzer which uses other analyzers
  */
-public class CompositeMorphAnalyzer implements IMorphAnalyzer {
-
-    private List<IMorphAnalyzer> analyzers;
+public class CompositeMorphAnalyzer implements IMorphAnalyzer, Serializable {
+	private static final long serialVersionUID = -5372967921686921026L;
+	
+	private List<IMorphAnalyzer> analyzers;
 
     public CompositeMorphAnalyzer(List<IMorphAnalyzer> analyzers){
 
-        // If composite analyzer does not include not null analyzer than throw exception
-        if (analyzers == null || analyzers.size() == 0){
-            final String EXC_MESSAGE = "Constructor must contain at least one Morphological Analyzer";
-            throw new IllegalArgumentException(EXC_MESSAGE);
-        }
-
         // Add not null factories to ArrayList
-        this.analyzers = new ArrayList<>();
+        this.analyzers = Objects.requireNonNull(analyzers);
 
         for (IMorphAnalyzer an : analyzers){
             if (an != null){
@@ -35,7 +32,7 @@ public class CompositeMorphAnalyzer implements IMorphAnalyzer {
     public Collection<IWord> analyze (String word) {
 
         if (word == null){
-            return null;
+            return new ArrayList<>();
         }
 
         // Use the first analyzer which is able to analyze the word
@@ -53,11 +50,6 @@ public class CompositeMorphAnalyzer implements IMorphAnalyzer {
 
 
     public Boolean canHandle(String word) {
-
-        // todo add - symbol to RegExp
-        if (word == null || !word.matches("^[а-я|А-Я]+$")){
-            return false;
-        }
 
         for (IMorphAnalyzer an : analyzers) {
             if (an.canHandle(word)){

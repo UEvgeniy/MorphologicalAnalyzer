@@ -3,7 +3,7 @@ package datamodel;
 
 public class Word implements IWord {
 
-    private String word, lemma, propeties;
+    private final String word, lemma, propeties;
 
     public Word(String word, String lemma, String properties){
         this.word = word;

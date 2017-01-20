@@ -1,31 +1,29 @@
 package factories;
 
 
-import analyzers.IMorphAnalyzer;
-
-import java.io.Closeable;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
+
+import analyzers.IMorphAnalyzer;
 
 
 /**
  *  Class loads instance of classes IMorphAnalyzer
  */
-public class MorphAnalyzerLoader implements IMorphAnalyzerFactory, Closeable{
+public class MorphAnalyzerLoader implements IMorphAnalyzerFactory {
 
-    private final ObjectInputStream ois;
+    private final Path path;
 
     public MorphAnalyzerLoader(Path path) throws IOException{
-
-        FileInputStream fis = new FileInputStream(path.toString());
-        this.ois = new ObjectInputStream(fis);
+    	this.path = path;
     }
 
     public IMorphAnalyzer create() {
 
-        try {
+        try (ObjectInputStream ois = new ObjectInputStream(Files.newInputStream(path, StandardOpenOption.READ))) {
             return (IMorphAnalyzer) ois.readObject();
         }
         catch (IOException | ClassNotFoundException e) {
@@ -34,7 +32,4 @@ public class MorphAnalyzerLoader implements IMorphAnalyzerFactory, Closeable{
 
     }
 
-    public void close() throws IOException {
-        ois.close();
-    }
 }

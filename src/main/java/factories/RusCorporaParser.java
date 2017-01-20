@@ -5,19 +5,54 @@ import datamodel.Word;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+
 
 /**
  * RusCorpora dictionary parser
  */
-class RusCorporaParser {
+class RusCorporaParser implements IDatasetParser{
 
     private List<File> files;
 
-    RusCorporaParser(List<File> dataset){
+    public RusCorporaParser(File dataset) {
+    	this(getFileList(dataset));
+    }
+    
+    private static List<File> getFileList(File dataset){
+    	if (dataset == null) {
+            final String EXC_MESSAGE = "Data set in Dictionary factory cannot be null.";
+            throw new IllegalArgumentException(EXC_MESSAGE);
+        }
+
+        List<File> files = new ArrayList<>();
+
+        // If dataset is directory, than read all files from this dir
+        if (dataset.isDirectory()) {
+            File[] filesInDir = dataset.listFiles();
+
+            if (filesInDir == null || filesInDir.length == 0) {
+                final String EXC_MESSAGE = "Dataset directory must contain at least one file.";
+                throw new IllegalArgumentException(EXC_MESSAGE);
+            }
+
+            files = Arrays.asList(filesInDir);
+        }
+        // else dataset is considered as file
+        else {
+            files.add(dataset);
+        }
+        return files;
+    }
+    
+    public RusCorporaParser(List<File> dataset){
 
         if (dataset == null || dataset.size() == 0) {
             final String EXC_MESSAGE = "Data set in Dictionary cannot be null.";
@@ -35,7 +70,9 @@ class RusCorporaParser {
         );
     }
 
-    HashSet<IWord> getDictionary(){
+    
+    @Override
+    public HashSet<IWord> getDictionary(){
 
         HashSet<IWord> words = new HashSet<>();
 
@@ -50,10 +87,12 @@ class RusCorporaParser {
 
         return words;
     }
+    
+    private static Pattern wordPattern = Pattern.compile("<w><ana lex=\"([^\"]+)\" gr=\"([^\"]+)\"></ana>([^<]+)</w>");
 
     private Collection<IWord> extractWords(File file) {
 
-        Collection<IWord> result = new ArrayList<>();
+        Set<IWord> result = new HashSet<>();
 
         try {
 
@@ -71,6 +110,13 @@ class RusCorporaParser {
             String line;
 
             while ((line = bis.readLine()) != null) {
+            	/*TODO use Matcher.
+            	Matcher matcher = wordPattern.matcher(line);
+            	while(matcher.find()){
+            		String lemma = matcher.group(1);
+            		String pos = matcher.group(2);
+            		String word = matcher.group(3);
+            	}*/
 
                 // Condition for situations when openTag was found before, but no closeTag yet
                 if (insideWordTag) {
@@ -82,7 +128,8 @@ class RusCorporaParser {
                         String[] splitted = line.split(closeTag, 2);
 
                         wordLine = wordLine.concat(splitted[0]);
-                        tryAddWord(result, wordLine);
+                        result.add(parse(wordLine));
+                        //tryAddWord(result, wordLine);
 
                         line = splitted[1];
 
@@ -125,6 +172,7 @@ class RusCorporaParser {
     }
 
 
+    
     private void tryAddWord(Collection<IWord> words, String line){
 
         IWord word = parse(line);
@@ -133,7 +181,6 @@ class RusCorporaParser {
         }
 
     }
-
 
     private IWord parse(String line) {
 

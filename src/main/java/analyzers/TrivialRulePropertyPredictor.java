@@ -23,13 +23,13 @@ public class TrivialRulePropertyPredictor implements IPropertyPredictor{
 
 
     @Override
-    public Collection<ILemmaRule> predict(MorphemedWord word) {
+    public Collection<IWord> predict(MorphemedWord word) {
 
-        Collection<ILemmaRule> result = new ArrayList<>();
+        Collection<IWord> result = new ArrayList<>();
 
         for (ILemmaRule rule : rules){
             if (rule.isApplicable(word)){
-                result.add(rule);
+                result.add(apply(word, rule));
             }
         }
 
@@ -37,7 +37,7 @@ public class TrivialRulePropertyPredictor implements IPropertyPredictor{
     }
 
 
-    public IWord apply(MorphemedWord mWord, ILemmaRule lemmaRule){
+    private IWord apply(MorphemedWord mWord, ILemmaRule lemmaRule){
 
         return new Word(
                 mWord.getWord(),

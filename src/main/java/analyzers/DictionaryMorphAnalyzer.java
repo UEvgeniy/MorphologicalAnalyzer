@@ -1,19 +1,19 @@
 package analyzers;
 
-import datamodel.IWord;
-
 import java.util.Collection;
-import java.util.HashSet;
+import java.util.Set;
 import java.util.stream.Collectors;
+
+import datamodel.IWord;
 
 /**
  * Model figures out POS + properties by searching the word in the dictionary
  */
 public class DictionaryMorphAnalyzer implements IMorphAnalyzer {
 
-    private HashSet<IWord> dictionary;
+    private Set<IWord> dictionary;
 
-    public DictionaryMorphAnalyzer(HashSet<IWord> words){
+    public DictionaryMorphAnalyzer(Set<IWord> words){
 
         if (words == null || words.size() == 0){
             final String EXC_MESSAGE = "Dictionary cannot be empty.";

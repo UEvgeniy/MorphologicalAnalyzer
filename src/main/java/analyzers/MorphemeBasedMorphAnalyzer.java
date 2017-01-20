@@ -1,11 +1,10 @@
 package analyzers;
 
-import datamodel.ILemmaRule;
-import datamodel.IWord;
-import datamodel.MorphemedWord;
-
 import java.util.ArrayList;
 import java.util.Collection;
+
+import datamodel.IWord;
+import datamodel.MorphemedWord;
 
 /**
  * Model of predicting words POS + properties
@@ -32,14 +31,8 @@ public class MorphemeBasedMorphAnalyzer implements IMorphAnalyzer
         for (MorphemedWord mWord : morphemedWords) {
 
             // For each variant of morpheme extraction try to define properties
-            Collection<ILemmaRule> appropriateRule = propertyPredictor.predict(mWord);
+           result.addAll(propertyPredictor.predict(mWord));
 
-            for (ILemmaRule rule : appropriateRule) {
-                // For each variant of property form IWord
-                result.add(
-                        propertyPredictor.apply(mWord, rule)
-                );
-            }
         }
 
         return result;

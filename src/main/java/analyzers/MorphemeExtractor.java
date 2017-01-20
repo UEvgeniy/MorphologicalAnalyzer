@@ -13,7 +13,7 @@ import java.util.List;
  */
 public class MorphemeExtractor {
 
-    private List<IMorpheme> morphemes;
+    private final List<IMorpheme> morphemes;
 
     public MorphemeExtractor(Collection<IMorpheme> morphemes){
         this.morphemes = new ArrayList<>();
