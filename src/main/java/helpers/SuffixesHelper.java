@@ -6,17 +6,17 @@ import java.util.Objects;
 public class SuffixesHelper {
 
 	/**
-	 * @param word First string
-	 * @param lemma Second string
+	 * @param w1 First string
+	 * @param w2 Second string
      * @return The longest common substring of two strings from beginning
      */
-	public static short getCommonPrefixLength(String word, String lemma) {
+	public static short getCommonPrefixLength(String w1, String w2) {
 
-		checkNotNull(word, lemma);
+		checkNotNull(w1, w2);
 
 		short i = 0;
-		while (i < Math.min(word.length(), lemma.length())){
-		    if (word.charAt(i) == lemma.charAt(i))
+		while (i < Math.min(w1.length(), w2.length())){
+		    if (w1.charAt(i) == w2.charAt(i))
 		        i++;
 		    else
 		        break;
@@ -24,19 +24,33 @@ public class SuffixesHelper {
 		return i;
 	}
 
-	public static short getCommonSuffixesLength(String word, String lemma){
+	/**
+	 * @param w1 First string
+	 * @param w2 Second string
+	 * @return The longest common substring of two strings in the end
+	 */
+	public static short getCommonSuffixesLength(String w1, String w2){
 
-		checkNotNull(word, lemma);
+		checkNotNull(w1, w2);
 
 		short i = 0;
-		while (i < Math.min(word.length(), lemma.length())){
-			if (word.charAt(word.length() - 1 - i) == lemma.charAt(lemma.length() - 1 - i))
+		while (i < Math.min(w1.length(), w2.length())){
+			if (w1.charAt(w1.length() - 1 - i) == w2.charAt(w2.length() - 1 - i))
 				i++;
 			else
 				break;
 		}
 		return i;
 	}
+
+	public static short getDifferingSuffixesLength(String w1, String w2){
+
+		checkNotNull(w1, w2);
+
+		return (short)(w1.length() - getCommonPrefixLength(w1, w2));
+	}
+
+
 
 	private static void checkNotNull(String... values){
 		for (String str: values){

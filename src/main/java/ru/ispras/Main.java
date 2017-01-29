@@ -8,13 +8,47 @@ import helpers.FileSearcher;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 public class Main {
 
     public static void main(String[] args) {
-        testAllAnalyzers();
+        testAOT();
+
+    }
+
+
+    private static void testAOT(){
+
+        Path saveTo = new File("D://dict/aot.nlzr").toPath();
+
+        List<File> dict = FileSearcher.getFileList(new File("D://dict"), ".xhtml");
+
+        //IDatasetParser parser = new RusCorporaParser(dict);
+
+        //IMorphAnalyzerFactory aotFact = new AotBasedFactory(parser);
+
+        try {
+            //IMorphAnalyzerFactory saver = new MorphAnalyzerSaver(aotFact, saveTo);
+            //IMorphAnalyzer aot = saver.create();
+
+            IMorphAnalyzer aot = new MorphAnalyzerLoader(saveTo).create();
+
+            tryAnalyze(aot,
+                    "гаманка",      // based on "наркоманка" expected "гаманок"
+                    "шуфлядки",     // based on "оглядки"
+                    "млявого",      // based on "кудрявого"
+                    "сабан",        // based on "кабан"
+                    "студака"       // based on "чудака"
+            );
+
+
+        } catch (IOException e) {
+            System.out.print(e.getMessage());
+        }
 
     }
 
@@ -63,16 +97,17 @@ public class Main {
         }
     }
 
-    private static void tryAnalyze(IMorphAnalyzer an, String word){
-        if (an.canHandle(word)) {
-            Collection<IWord> words = an.analyze(word);
-            System.out.println("WORD: " + word);
-            for (IWord w : words){
-                System.out.println("\tLEMMA: " + w.getLemma() + "\tPROPS: " + w.getProperties());
+    private static void tryAnalyze(IMorphAnalyzer an, String... words){
+        for (String word: words) {
+            if (an.canHandle(word)) {
+                Collection<IWord> answers = an.analyze(word);
+                System.out.println("WORD: " + word);
+                for (IWord w : answers) {
+                    System.out.println("\tLEMMA: " + w.getLemma() + "\tPROPS: " + w.getProperties());
+                }
+            } else {
+                System.out.println("Word " + word + "\n\tcannot be analyzed");
             }
-        }
-        else{
-            System.out.println("Word " + word + "\n\tcannot be analyzed");
         }
     }
 
