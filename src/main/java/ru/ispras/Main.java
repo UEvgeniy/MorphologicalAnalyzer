@@ -4,6 +4,7 @@ import analyzers.IMorphAnalyzer;
 import datamodel.IWord;
 import datamodel.Word;
 import factories.*;
+import helpers.FileSearcher;
 
 import java.io.File;
 import java.io.IOException;
@@ -13,7 +14,11 @@ import java.util.Collection;
 public class Main {
 
     public static void main(String[] args) {
+        testAllAnalyzers();
 
+    }
+
+    private static void testAllAnalyzers(){
         // A .xhtml file or folder containing .xhtml files (RusCorpora)
         final File dict = new File("D://dict");
 
@@ -23,14 +28,16 @@ public class Main {
         // Can analyze only words with an even word length and define lemma and properties as 42
         //IMorphAnalyzerFactory fact42 = veryPlainAnalyzer();
 
+        IDatasetParser parser = new RusCorporaParser(FileSearcher.getFileList(dict, ".xhtml"));
+
         // Baseline implementation of Morpheme Extractor and Property Predictor
-        IMorphAnalyzerFactory mbma = new MorphAnalyzerTrainer(dict);
+        IMorphAnalyzerFactory mbma = new MorphAnalyzerTrainer(parser);
 
         try {
 
             // Parse dictionary and save it
-            IMorphAnalyzerFactory dictionary = new DictionaryFactory(dict);
-            IMorphAnalyzerFactory saver = new MorphAnalyzerSaver(dictionary, saveTo.toPath());
+            IMorphAnalyzerFactory dictFactory = new DictionaryFactory(dict);
+            IMorphAnalyzerFactory saver = new MorphAnalyzerSaver(dictFactory, saveTo.toPath());
             saver.create();
 
             // Load saved analyzer
@@ -45,7 +52,7 @@ public class Main {
             // Recommended to add words with odd/even length and also words from parsed dictionary
             tryAnalyze(analyzer, "и");         // dictionary analyzer
             tryAnalyze(analyzer, "колобки");   // MorphemeBasedAnalyzer
-            tryAnalyze(analyzer, "делал");     // MorphemeBasedAnalyzer
+            tryAnalyze(analyzer, "лестницы");     // MorphemeBasedAnalyzer
             tryAnalyze(analyzer, "скрывающееся");// MorphemeBasedAnalyzer
             tryAnalyze(analyzer, "менять");    //
             tryAnalyze(analyzer, "стимулом");  // dictionary analyzer
@@ -54,8 +61,6 @@ public class Main {
         } catch (IOException e) {
             System.out.print(e.getMessage());
         }
-
-
     }
 
     private static void tryAnalyze(IMorphAnalyzer an, String word){

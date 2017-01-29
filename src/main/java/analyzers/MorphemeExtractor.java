@@ -4,23 +4,27 @@ import datamodel.IMorpheme;
 import datamodel.Morpheme;
 import datamodel.MorphemedWord;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.io.Serializable;
+import java.util.*;
 
 /**
- *
+ * Class extracts morphemes from word using a collection of morphemes
  */
-public class MorphemeExtractor {
+public class MorphemeExtractor implements Serializable {
 
-    private final List<IMorpheme> morphemes;
+    private static final long serialVersionUID = 6783132388005782383L;
+    private final Set<IMorpheme> morphemes;
 
-    public MorphemeExtractor(Collection<IMorpheme> morphemes){
-        this.morphemes = new ArrayList<>();
+    public MorphemeExtractor(Set<IMorpheme> morphemes){
 
-        this.morphemes.addAll(morphemes);
+        this.morphemes = Objects.requireNonNull(morphemes, "Collection of morphemes cannot be null");
     }
 
+    /**
+     * Method finds all possible splitting words on morphemes using collection of morphemes
+     * @param word The word for extracting
+     * @return the collection of possible splitting
+     */
     public Collection<MorphemedWord> extract(String word){
 
         ArrayList<MorphemedWord> result = new ArrayList<>();

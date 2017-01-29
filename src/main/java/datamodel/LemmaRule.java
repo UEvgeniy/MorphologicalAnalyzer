@@ -1,16 +1,18 @@
 package datamodel;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Rule containing Pos + properties and the process of word transformation to lemma
  */
 
-// todo now Lemma rule has trivial mechanism of transformation, may be need to be updated
-public class LemmaRule implements ILemmaRule{
+public class LemmaRule implements ILemmaRule, Serializable{
 
+    private static final long serialVersionUID = -6753719757708841662L;
     private Collection<IMorpheme> removed;
     private  Collection<IMorpheme> added;
 
@@ -26,6 +28,8 @@ public class LemmaRule implements ILemmaRule{
     @Override
     public Boolean isApplicable(MorphemedWord word) {
 
+        // todo improve method. Use binary classificatory
+
         Collection<IMorpheme> morphemesInWord = word.getMorphemes();
 
         for (IMorpheme morpheme : removed){
@@ -38,18 +42,14 @@ public class LemmaRule implements ILemmaRule{
 
     @Override
     public MorphemedWord apply(MorphemedWord word) {
-        //String lemma = word.getWord();
+
         List<IMorpheme> lemmaMorphemes = new ArrayList<>(word.getMorphemes());
 
-
-
         for (IMorpheme m : removed){
-        //    lemma = lemma.replace(m.getText(), "");
             lemmaMorphemes.removeIf((morpheme) -> morpheme.getText().equals(m.getText()));
         }
 
         for (IMorpheme m : added){
-        //    lemma = lemma.concat(m.getText());
             lemmaMorphemes.add(m);
         }
 
@@ -61,38 +61,22 @@ public class LemmaRule implements ILemmaRule{
         return properties;
     }
 
-    @Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((added == null) ? 0 : added.hashCode());
-		result = prime * result + ((properties == null) ? 0 : properties.hashCode());
-		result = prime * result + ((removed == null) ? 0 : removed.hashCode());
-		return result;
-	}
 
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if ((obj == null) || (getClass() != obj.getClass()))
-			return false;
-		LemmaRule other = (LemmaRule) obj;
-		if (added == null) {
-			if (other.added != null)
-				return false;
-		} else if (!added.equals(other.added))
-			return false;
-		if (properties == null) {
-			if (other.properties != null)
-				return false;
-		} else if (!properties.equals(other.properties))
-			return false;
-		if (removed == null) {
-			if (other.removed != null)
-				return false;
-		} else if (!removed.equals(other.removed))
-			return false;
-		return true;
-	}
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof LemmaRule)) return false;
+
+        LemmaRule lemmaRule = (LemmaRule) o;
+
+        if (removed != null ? !removed.equals(lemmaRule.removed) : lemmaRule.removed != null) return false;
+        if (added != null ? !added.equals(lemmaRule.added) : lemmaRule.added != null) return false;
+        return properties != null ? properties.equals(lemmaRule.properties) : lemmaRule.properties == null;
+
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(removed, added, properties);
+    }
 }

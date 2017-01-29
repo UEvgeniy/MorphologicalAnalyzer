@@ -1,23 +1,16 @@
 package factories;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
 import analyzers.IPropertyPredictor;
 import analyzers.TrivialRulePropertyPredictor;
-import datamodel.ILemmaRule;
-import datamodel.IMorpheme;
-import datamodel.IWord;
-import datamodel.LemmaRule;
-import datamodel.Morpheme;
+import datamodel.*;
+import helpers.SuffixesHelper;
+
+import java.util.*;
 
 /**
  * Factory for classes which predict PoS + properties for morphemed word
  */
-class TrivialLemmaRulePropertyPredictorTrainer implements IPropertyPredictorFactory {
+public class TrivialLemmaRulePropertyPredictorTrainer implements IPropertyPredictorFactory {
 
     private Collection<IWord> words;
 
@@ -36,7 +29,7 @@ class TrivialLemmaRulePropertyPredictorTrainer implements IPropertyPredictorFact
 
         for (IWord word : words){
 
-            String w = word.toString();
+            String w = word.getWord();
             String lemma = word.getLemma();
 
             short i = SuffixesHelper.getCommonPrefixLength(w, lemma);

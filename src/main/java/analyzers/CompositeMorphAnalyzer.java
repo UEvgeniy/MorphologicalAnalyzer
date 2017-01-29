@@ -1,39 +1,28 @@
 package analyzers;
 
 
+import datamodel.IWord;
+
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
-
-import datamodel.IWord;
 
 /**
  * Morphological analyzer which uses other analyzers
  */
 public class CompositeMorphAnalyzer implements IMorphAnalyzer, Serializable {
-	private static final long serialVersionUID = -5372967921686921026L;
-	
+
+    private static final long serialVersionUID = -707741344160142770L;
 	private List<IMorphAnalyzer> analyzers;
 
     public CompositeMorphAnalyzer(List<IMorphAnalyzer> analyzers){
-
-        // Add not null factories to ArrayList
-        this.analyzers = Objects.requireNonNull(analyzers);
-
-        for (IMorphAnalyzer an : analyzers){
-            if (an != null){
-                this.analyzers.add(an);
-            }
-        }
+        this.analyzers = Objects.requireNonNull(analyzers, "List of analyzers cannot be null");
     }
 
-    public Collection<IWord> analyze (String word) {
 
-        if (word == null){
-            return new ArrayList<>();
-        }
+    @Override
+    public Collection<IWord> analyze (String word) {
 
         // Use the first analyzer which is able to analyze the word
         for (IMorphAnalyzer an : analyzers) {
@@ -44,11 +33,11 @@ public class CompositeMorphAnalyzer implements IMorphAnalyzer, Serializable {
 
         // In order to avoid this exception user should check the possibility of analyzer
         // by invoking canHandle() method
-        final String EXC_MESSAGE = "No analyzer can analyze word \'" + word + "\'";
-        throw new UnsupportedOperationException(EXC_MESSAGE);
+        throw new RuntimeException("No analyzer can analyze word \'" + word + "\'");
     }
 
 
+    @Override
     public Boolean canHandle(String word) {
 
         for (IMorphAnalyzer an : analyzers) {

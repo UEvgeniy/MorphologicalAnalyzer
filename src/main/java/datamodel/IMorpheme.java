@@ -4,6 +4,9 @@ package datamodel;
  * Interface for morphemes
  */
 public interface IMorpheme {
+    /**
+     * @return String representation of morpheme
+     */
     String getText();
-    // todo getType();
+    // todo getType() may be useful soon...;
 }

@@ -13,8 +13,9 @@ public class MorphemedWord {
         this.morphemes = morphemes;
     }
 
-
-    // todo replace this to toString() method (like IWord realization)
+    /**
+     * @return String representation of the word
+     */
     public String getWord(){
         String word = "";
 
@@ -25,6 +26,9 @@ public class MorphemedWord {
         return word;
     }
 
+    /**
+     * @return Collection of morphemes that make up the word
+     */
     public List<IMorpheme> getMorphemes(){
         return morphemes;
     }

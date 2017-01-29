@@ -3,10 +3,7 @@ package factories;
 
 import analyzers.IMorphAnalyzer;
 
-import java.io.Closeable;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
+import java.io.*;
 import java.nio.file.Path;
 
 /**
@@ -27,15 +24,13 @@ public class MorphAnalyzerSaver implements IMorphAnalyzerFactory, Closeable {
         );
     }
 
-
+    @Override
     public IMorphAnalyzer create() {
         IMorphAnalyzer analyzer = factory.create();
 
         // Serialize analyzer
         try {
             oos.writeObject(analyzer);
-            // todo remove log
-            System.out.println("Instance of IMorphAnalyzer was successfully saved...");
         }
         catch (IOException exception){
             throw new RuntimeException(exception);
@@ -44,7 +39,7 @@ public class MorphAnalyzerSaver implements IMorphAnalyzerFactory, Closeable {
         return analyzer;
     }
 
-
+    @Override
     public void close() throws IOException {
         oos.flush();
         oos.close();

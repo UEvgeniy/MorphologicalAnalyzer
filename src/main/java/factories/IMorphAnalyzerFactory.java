@@ -3,9 +3,12 @@ package factories;
 
 import analyzers.IMorphAnalyzer;
 
-/**
- * An interface for classes that construct instances of classes implementing IMorphAnalyzer
- */
+
 public interface IMorphAnalyzerFactory {
+
+    /**
+     * Method constructs analyzer
+     * @return Word's morphological analyzer
+     */
     IMorphAnalyzer create();
 }

@@ -1,10 +1,10 @@
 package factories;
 
-import java.util.Set;
-
 import analyzers.IMorphAnalyzer;
 import analyzers.MorphemeBasedMorphAnalyzer;
 import datamodel.IWord;
+
+import java.util.Set;
 
 /**
  * Class uses machine learning for predicting POS + properties of the word
@@ -16,7 +16,8 @@ public class MorphAnalyzerTrainer implements IMorphAnalyzerFactory{
     public MorphAnalyzerTrainer(IDatasetParser parser){
     	this.parser = parser;
     }
-    
+
+    @Override
     public IMorphAnalyzer create() {
 
         Set<IWord> words = parser.getDictionary();

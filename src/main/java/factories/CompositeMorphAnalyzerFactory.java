@@ -6,6 +6,7 @@ import analyzers.IMorphAnalyzer;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Factory for creating instances of CompositeMMorphAnalyzer
@@ -16,25 +17,14 @@ public class CompositeMorphAnalyzerFactory implements IMorphAnalyzerFactory {
 
     public CompositeMorphAnalyzerFactory(IMorphAnalyzerFactory... factories) {
 
-        // If composite factory includes no factories than throw exception
-        if (factories == null || factories.length == 0){
-            final String EXC_MESSAGE = "Constructor must contain at least one not null Analyzer Factory";
-            throw new IllegalArgumentException(EXC_MESSAGE);
-        }
-
-        // Add not null factories to ArrayList
         this.factories = new ArrayList<>();
 
-        for (IMorphAnalyzerFactory f : factories){
-            if (f != null){
-                this.factories.add(f);
-            }
+        for (IMorphAnalyzerFactory f : Objects.requireNonNull(factories, "Collection cannot be null")){
+            this.factories.add(Objects.requireNonNull(f, "Analyzer cannot be null"));
         }
-
-
     }
 
-
+    @Override
     public IMorphAnalyzer create() {
         List<IMorphAnalyzer> analyzers = new ArrayList<>();
 
