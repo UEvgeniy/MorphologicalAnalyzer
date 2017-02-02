@@ -5,17 +5,51 @@ import datamodel.IWord;
 import datamodel.Word;
 import factories.*;
 import helpers.FileSearcher;
+import maslov_segalovich_based.MSFactory;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 public class Main {
 
     public static void main(String[] args) {
-        testAllAnalyzers();
 
+        testSegalovich();
+
+    }
+
+
+    private static void testSegalovich(){
+        Path saveTo = new File("D://dict/aot.nlzr").toPath();
+
+        List<File> dict = FileSearcher.getFileList(new File("D://dict"), ".xhtml");
+
+        IDatasetParser parser = new RusCorporaParser(dict);
+
+        IMorphAnalyzerFactory segFact = new MSFactory(parser);
+
+        try {
+            IMorphAnalyzerFactory saver = new MorphAnalyzerSaver(segFact, saveTo);
+            IMorphAnalyzer seg = saver.create();
+
+            //IMorphAnalyzer aot = new MorphAnalyzerLoader(saveTo).create();
+
+            tryAnalyze(seg,
+                    "гаманка",      // based on "наркоманка" expected "гаманок"
+                    "шуфлядки",     // based on "оглядки"
+                    "млявого",      // based on "кудрявого"
+                    "сабан",        // based on "кабан"
+                    "студака"       // based on "чудака"
+            );
+
+
+        } catch (IOException e) {
+            System.out.print(e.getMessage());
+        }
     }
 
     private static void testAllAnalyzers(){
@@ -63,11 +97,12 @@ public class Main {
         }
     }
 
-    private static void tryAnalyze(IMorphAnalyzer an, String word){
+    private static void tryAnalyze(IMorphAnalyzer an, String... words){
+        for (String word: words)
         if (an.canHandle(word)) {
-            Collection<IWord> words = an.analyze(word);
+            Collection<IWord> res = an.analyze(word);
             System.out.println("WORD: " + word);
-            for (IWord w : words){
+            for (IWord w : res){
                 System.out.println("\tLEMMA: " + w.getLemma() + "\tPROPS: " + w.getProperties());
             }
         }
