@@ -5,6 +5,7 @@ import datamodel.IWord;
 import datamodel.Word;
 import factories.*;
 import helpers.FileSearcher;
+import maslov_segalovich_based.MSFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -17,27 +18,26 @@ public class Main {
 
     public static void main(String[] args) {
         testAOT();
-
     }
 
 
-    private static void testAOT(){
 
+    private static void testSegalovich(){
         Path saveTo = new File("D://dict/aot.nlzr").toPath();
 
         List<File> dict = FileSearcher.getFileList(new File("D://dict"), ".xhtml");
 
-        //IDatasetParser parser = new RusCorporaParser(dict);
+        IDatasetParser parser = new RusCorporaParser(dict);
 
-        //IMorphAnalyzerFactory aotFact = new AotBasedFactory(parser);
+        IMorphAnalyzerFactory segFact = new MSFactory(parser);
 
         try {
-            //IMorphAnalyzerFactory saver = new MorphAnalyzerSaver(aotFact, saveTo);
-            //IMorphAnalyzer aot = saver.create();
+            IMorphAnalyzerFactory saver = new MorphAnalyzerSaver(segFact, saveTo);
+            IMorphAnalyzer seg = saver.create();
 
-            IMorphAnalyzer aot = new MorphAnalyzerLoader(saveTo).create();
+            //IMorphAnalyzer aot = new MorphAnalyzerLoader(saveTo).create();
 
-            tryAnalyze(aot,
+            tryAnalyze(seg,
                     "гаманка",      // based on "наркоманка" expected "гаманок"
                     "шуфлядки",     // based on "оглядки"
                     "млявого",      // based on "кудрявого"
@@ -49,7 +49,6 @@ public class Main {
         } catch (IOException e) {
             System.out.print(e.getMessage());
         }
-
     }
 
     private static void testAllAnalyzers(){
@@ -98,6 +97,7 @@ public class Main {
     }
 
     private static void tryAnalyze(IMorphAnalyzer an, String... words){
+
         for (String word: words) {
             if (an.canHandle(word)) {
                 Collection<IWord> answers = an.analyze(word);
