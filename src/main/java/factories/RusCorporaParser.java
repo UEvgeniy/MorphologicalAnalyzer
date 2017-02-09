@@ -16,7 +16,7 @@ public class RusCorporaParser implements IDatasetParser{
 
     private List<File> files;
     private static final Pattern wordPattern =
-            Pattern.compile("<w><ana lex=\"([^\"]+)\" gr=\"([^\"]+)\"></ana>([^<]+)</w>");
+            Pattern.compile("<w><ana lex=\"([^\"]+)\" gr=\"([^\"]+)\"></ana>([^<]+)</w>.*");
 
 
     public RusCorporaParser(List<File> files) {

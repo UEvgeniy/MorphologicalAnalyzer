@@ -17,10 +17,9 @@ import java.util.List;
 public class Main {
 
     public static void main(String[] args) {
-
-        testSegalovich();
-
+        testAOT();
     }
+
 
 
     private static void testSegalovich(){
@@ -98,16 +97,17 @@ public class Main {
     }
 
     private static void tryAnalyze(IMorphAnalyzer an, String... words){
-        for (String word: words)
-        if (an.canHandle(word)) {
-            Collection<IWord> res = an.analyze(word);
-            System.out.println("WORD: " + word);
-            for (IWord w : res){
-                System.out.println("\tLEMMA: " + w.getLemma() + "\tPROPS: " + w.getProperties());
+
+        for (String word: words) {
+            if (an.canHandle(word)) {
+                Collection<IWord> answers = an.analyze(word);
+                System.out.println("WORD: " + word);
+                for (IWord w : answers) {
+                    System.out.println("\tLEMMA: " + w.getLemma() + "\tPROPS: " + w.getProperties());
+                }
+            } else {
+                System.out.println("Word " + word + "\n\tcannot be analyzed");
             }
-        }
-        else{
-            System.out.println("Word " + word + "\n\tcannot be analyzed");
         }
     }
 
