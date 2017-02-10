@@ -1,5 +1,7 @@
-package analyzers;
+package baseline;
 
+import analyzers.IMorphAnalyzer;
+import analyzers.IPropertyPredictor;
 import datamodel.IWord;
 import datamodel.MorphemedWord;
 
@@ -11,13 +13,13 @@ import java.util.Objects;
 /**
  * Model of predicting words POS + properties
  */
-public class MorphemeBasedMorphAnalyzer implements IMorphAnalyzer, Serializable {
+class MorphemeBasedMorphAnalyzer implements IMorphAnalyzer, Serializable {
 
     private static final long serialVersionUID = 5069847036891425458L;
     private MorphemeExtractor morphemeExtractor;
     private IPropertyPredictor propertyPredictor;
 
-    public MorphemeBasedMorphAnalyzer(MorphemeExtractor me, IPropertyPredictor pp){
+    MorphemeBasedMorphAnalyzer(MorphemeExtractor me, IPropertyPredictor pp){
         String msg = " cannot be null.";
         morphemeExtractor = Objects.requireNonNull(me, "Morpheme extractor".concat(msg));
         propertyPredictor = Objects.requireNonNull(pp, "Property predictor".concat(msg));

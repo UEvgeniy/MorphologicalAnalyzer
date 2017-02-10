@@ -13,21 +13,16 @@ import java.util.*;
  */
 public class DictionaryFactory implements IMorphAnalyzerFactory {
 
-    private List<File> files;
+    private File file;
 
     public DictionaryFactory(File dataset) {
-
-        files = FileSearcher.getFileList(
-                Objects.requireNonNull(dataset, "Data set cannot be null."),
-                ".xhtml"
-        );
+        file = Objects.requireNonNull(dataset, "Data set cannot be null.");
     }
 
     @Override
     public IMorphAnalyzer create() {
 
-        // todo replace constructor argument File -> Parser
-        RusCorporaParser parser = new RusCorporaParser(files);
+        RusCorporaParser parser = new RusCorporaParser(file);
         HashSet<IWord> words = parser.getDictionary();
 
         return new DictionaryMorphAnalyzer(words);

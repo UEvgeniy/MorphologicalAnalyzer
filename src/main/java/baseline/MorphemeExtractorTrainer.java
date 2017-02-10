@@ -1,7 +1,6 @@
-package factories;
+package baseline;
 
 
-import analyzers.MorphemeExtractor;
 import datamodel.IMorpheme;
 import datamodel.IWord;
 import datamodel.Morpheme;
@@ -12,18 +11,18 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class MorphemeExtractorTrainer {
+class MorphemeExtractorTrainer {
 
     private Set<IWord> dictionary;
 
-    public MorphemeExtractorTrainer(Set<IWord> words) {
+    MorphemeExtractorTrainer(Set<IWord> words) {
 
         dictionary = new HashSet<>();
 
         dictionary.addAll(
                 Objects.requireNonNull(words, "Dictionary cannot be null.")
                 .stream()
-                .filter((word) -> word != null)
+                .filter(Objects::nonNull)
                 .collect(Collectors.toSet())
         );
     }
@@ -32,7 +31,7 @@ public class MorphemeExtractorTrainer {
      * Method forms collection of morphemes based on difference between word and its lemma
      * @return Morpheme extractor with collection of morphemes
      */
-    public MorphemeExtractor train(){
+    MorphemeExtractor train(){
 
         Set<IMorpheme> morphemes = new HashSet<>();
 

@@ -1,15 +1,17 @@
-package factories;
+package baseline;
 
 import analyzers.IMorphAnalyzer;
-import analyzers.MorphemeBasedMorphAnalyzer;
 import datamodel.IWord;
+import factories.IDatasetParser;
+import factories.IMorphAnalyzerFactory;
+import factories.IPropertyPredictorFactory;
 
 import java.util.Set;
 
 /**
  * Class uses machine learning for predicting POS + properties of the word
  */
-public class MorphAnalyzerTrainer implements IMorphAnalyzerFactory{
+public class MorphAnalyzerTrainer implements IMorphAnalyzerFactory {
 
     private final IDatasetParser parser;
 

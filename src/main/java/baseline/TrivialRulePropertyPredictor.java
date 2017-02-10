@@ -1,5 +1,6 @@
-package analyzers;
+package baseline;
 
+import analyzers.IPropertyPredictor;
 import datamodel.ILemmaRule;
 import datamodel.IWord;
 import datamodel.MorphemedWord;

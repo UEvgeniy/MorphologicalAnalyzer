@@ -2,6 +2,7 @@ package factories;
 
 import datamodel.IWord;
 import datamodel.Word;
+import helpers.FileSearcher;
 
 import java.io.*;
 import java.util.*;
@@ -19,8 +20,10 @@ public class RusCorporaParser implements IDatasetParser{
             Pattern.compile("<w><ana lex=\"([^\"]+)\" gr=\"([^\"]+)\"></ana>([^<]+)</w>.*");
 
 
-    public RusCorporaParser(List<File> files) {
-    	this.files = Objects.requireNonNull(files, "Dataset cannot be null.");
+    public RusCorporaParser(File file) {
+    	this.files = Objects.requireNonNull(
+                FileSearcher.getFileList(file, ".xhtml"),
+                "Dataset cannot be null.");
     }
 
     
@@ -30,6 +33,7 @@ public class RusCorporaParser implements IDatasetParser{
         HashSet<IWord> words = new HashSet<>();
 
         for (File f : files) {
+
             words.addAll(
                     extractWords(f)
             );

@@ -1,4 +1,4 @@
-package analyzers;
+package baseline;
 
 import datamodel.IMorpheme;
 import datamodel.Morpheme;
@@ -10,12 +10,12 @@ import java.util.*;
 /**
  * Class extracts morphemes from word using a collection of morphemes
  */
-public class MorphemeExtractor implements Serializable {
+class MorphemeExtractor implements Serializable {
 
     private static final long serialVersionUID = 6783132388005782383L;
     private final Set<IMorpheme> morphemes;
 
-    public MorphemeExtractor(Set<IMorpheme> morphemes){
+    MorphemeExtractor(Set<IMorpheme> morphemes){
 
         this.morphemes = Objects.requireNonNull(morphemes, "Collection of morphemes cannot be null");
     }
@@ -25,7 +25,7 @@ public class MorphemeExtractor implements Serializable {
      * @param word The word for extracting
      * @return the collection of possible splitting
      */
-    public Collection<MorphemedWord> extract(String word){
+    Collection<MorphemedWord> extract(String word){
 
         ArrayList<MorphemedWord> result = new ArrayList<>();
 

@@ -1,8 +1,8 @@
-package factories;
+package baseline;
 
 import analyzers.IPropertyPredictor;
-import analyzers.TrivialRulePropertyPredictor;
 import datamodel.*;
+import factories.IPropertyPredictorFactory;
 import helpers.SuffixesHelper;
 
 import java.util.*;

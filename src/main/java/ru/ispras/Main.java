@@ -1,6 +1,10 @@
 package ru.ispras;
 
 import analyzers.IMorphAnalyzer;
+import baseline.MorphAnalyzerTrainer;
+import bin_class_approach.RulesApplicabilityFactory;
+import bin_class_approach.naive_bayes.Classification;
+import bin_class_approach.naive_bayes.BayesClassifier;
 import datamodel.IWord;
 import datamodel.Word;
 import factories.*;
@@ -10,15 +14,33 @@ import maslov_segalovich_based.MSFactory;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 public class Main {
 
     public static void main(String[] args) {
-        testAOT();
+
+        binClassApr();
     }
+
+    private static void binClassApr(){
+
+        IDatasetParser parser = new RusCorporaParser(new File("D:/dict/texts"));
+        IMorphAnalyzerFactory fact = new RulesApplicabilityFactory(parser);
+
+        IMorphAnalyzer my = fact.create();
+
+        tryAnalyze(my, words);
+    }
+
+    private static String[] words = {
+            "гоношилась", "подошел", "невпечатляющих","коготочка",
+            "гаманка",      // based on "наркоманка" expected "гаманок"
+            "шуфлядки",     // based on "оглядки"
+            "млявого",      // based on "кудрявого"
+            "сабан",        // based on "кабан"
+            "студака"       // based on "чудака"
+    };
 
 
 
@@ -27,7 +49,7 @@ public class Main {
 
         List<File> dict = FileSearcher.getFileList(new File("D://dict"), ".xhtml");
 
-        IDatasetParser parser = new RusCorporaParser(dict);
+        IDatasetParser parser = new RusCorporaParser(null);
 
         IMorphAnalyzerFactory segFact = new MSFactory(parser);
 
@@ -37,13 +59,7 @@ public class Main {
 
             //IMorphAnalyzer aot = new MorphAnalyzerLoader(saveTo).create();
 
-            tryAnalyze(seg,
-                    "гаманка",      // based on "наркоманка" expected "гаманок"
-                    "шуфлядки",     // based on "оглядки"
-                    "млявого",      // based on "кудрявого"
-                    "сабан",        // based on "кабан"
-                    "студака"       // based on "чудака"
-            );
+            tryAnalyze(seg, words);
 
 
         } catch (IOException e) {
@@ -61,7 +77,7 @@ public class Main {
         // Can analyze only words with an even word length and define lemma and properties as 42
         //IMorphAnalyzerFactory fact42 = veryPlainAnalyzer();
 
-        IDatasetParser parser = new RusCorporaParser(FileSearcher.getFileList(dict, ".xhtml"));
+        IDatasetParser parser = new RusCorporaParser(null);
 
         // Baseline implementation of Morpheme Extractor and Property Predictor
         IMorphAnalyzerFactory mbma = new MorphAnalyzerTrainer(parser);
