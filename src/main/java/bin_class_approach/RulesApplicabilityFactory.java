@@ -6,8 +6,6 @@ import datamodel.IWord;
 import factories.IDatasetParser;
 import factories.IMorphAnalyzerFactory;
 import helpers.SuffixesHelper;
-
-import java.io.Serializable;
 import java.util.Objects;
 import java.util.Set;
 
@@ -50,7 +48,7 @@ public class RulesApplicabilityFactory implements IMorphAnalyzerFactory{
                 IApplyRule rule = new ApplyRule(remove, add, props);
 
                 // Learn the bayes classifier
-                bayes.learn(rule, Bigrams.get(w));
+                bayes.learn(rule, NGrams.get(w, 2));
             }
         }
 

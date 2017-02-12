@@ -27,7 +27,7 @@ public class RulesApplicabilityTrainer implements IMorphAnalyzer,Serializable {
     @Override
     public Collection<IWord> analyze(String word) {
         Set<Classification<String,IApplyRule>> prediction =
-                classifier.classifyDetailed(Bigrams.get(word));
+                classifier.classifyDetailed(NGrams.get(word, 2));
 
         Collection<IWord> res = new ArrayList<>();
 
