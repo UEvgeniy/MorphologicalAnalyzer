@@ -1,6 +1,7 @@
 package ru.ispras;
 
 import analyzers.IMorphAnalyzer;
+import aot_based.AotBasedFactory;
 import baseline.MorphAnalyzerTrainer;
 import bin_class_approach.RulesApplicabilityFactory;
 import bin_class_approach.naive_bayes.Classification;
@@ -26,9 +27,21 @@ public class Main {
     private static void binClassApr(){
 
         IDatasetParser parser = new RusCorporaParser(new File("D:/dict/texts"));
+
         IMorphAnalyzerFactory fact = new RulesApplicabilityFactory(parser);
 
-        IMorphAnalyzer my = fact.create();
+        File analyzer = new File("D:/dict/rules.nlzr");
+
+
+
+        IMorphAnalyzer my = null;
+        try {
+            //my = new MorphAnalyzerSaver(fact, analyzer.toPath()).create();
+            my = new MorphAnalyzerLoader(analyzer.toPath()).create();
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+            return;
+        }
 
         tryAnalyze(my, words);
     }

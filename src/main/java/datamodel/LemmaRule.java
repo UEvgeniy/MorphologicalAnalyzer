@@ -12,6 +12,7 @@ import java.util.Objects;
 
 public class LemmaRule implements ILemmaRule, Serializable{
 
+
     private static final long serialVersionUID = -6753719757708841662L;
     private Collection<IMorpheme> removed;
     private  Collection<IMorpheme> added;
@@ -28,7 +29,6 @@ public class LemmaRule implements ILemmaRule, Serializable{
     @Override
     public Boolean isApplicable(MorphemedWord word) {
 
-        // todo improve method. Use binary classificatory
 
         Collection<IMorpheme> morphemesInWord = word.getMorphemes();
 

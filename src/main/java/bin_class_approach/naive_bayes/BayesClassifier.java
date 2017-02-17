@@ -1,5 +1,6 @@
 package bin_class_approach.naive_bayes;
 
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.SortedSet;
@@ -19,7 +20,9 @@ import bin_class_approach.naive_bayes.*;
  * @param <T> The feature class.
  * @param <K> The category class.
  */
-public class BayesClassifier<T, K> extends Classifier<T, K> {
+public class BayesClassifier<T, K> extends Classifier<T, K> implements Serializable {
+
+    private static final long serialVersionUID = 442220739334732520L;
 
     /**
      * Calculates the product of all feature probabilities: PROD(P(featI|cat)

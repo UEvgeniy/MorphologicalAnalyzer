@@ -1,7 +1,8 @@
 package bin_class_approach;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.lang.reflect.Array;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * The only method forms the bigram for the word

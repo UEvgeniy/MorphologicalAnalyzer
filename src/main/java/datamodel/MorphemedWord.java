@@ -27,6 +27,16 @@ public class MorphemedWord {
     }
 
     /**
+     * @return The last morpheme in the word
+     */
+    public String getEnding(){
+        return morphemes.get(morphemes.size() - 1).getText();
+    }
+
+    public String getRoot() {
+        return morphemes.get(0).getText();
+    }
+    /**
      * @return Collection of morphemes that make up the word
      */
     public List<IMorpheme> getMorphemes(){

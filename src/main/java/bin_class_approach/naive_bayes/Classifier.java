@@ -1,5 +1,6 @@
 package bin_class_approach.naive_bayes;
 
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.Dictionary;
 import java.util.Enumeration;
@@ -21,7 +22,7 @@ import java.util.Set;
  * @param <K>
  *            A category class
  */
-public abstract class Classifier<T, K> implements IFeatureProbability<T, K> {
+public abstract class Classifier<T, K> implements IFeatureProbability<T, K>, Serializable {
 
     /**
      * Initial capacity of category dictionaries.
@@ -32,12 +33,13 @@ public abstract class Classifier<T, K> implements IFeatureProbability<T, K> {
      * Initial capacity of feature dictionaries. It should be quite big, because
      * the features will quickly outnumber the categories.
      */
-    private static final int INITIAL_FEATURE_DICTIONARY_CAPACITY = 32;
+    private static final int INITIAL_FEATURE_DICTIONARY_CAPACITY = 1000;
+    private static final long serialVersionUID = 4027836592171590049L;
 
     /**
      * The initial memory capacity or how many classifications are memorized.
      */
-    private int memoryCapacity = 1000;
+    private int memoryCapacity = 100000;
 
     /**
      * A dictionary mapping features to their number of occurrences in each

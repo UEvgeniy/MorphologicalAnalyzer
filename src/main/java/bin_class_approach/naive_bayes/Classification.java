@@ -1,5 +1,6 @@
 package bin_class_approach.naive_bayes;
 
+import java.io.Serializable;
 import java.util.Collection;
 
 /**
@@ -11,8 +12,9 @@ import java.util.Collection;
  * @param <T> The feature class.
  * @param <K> The category class.
  */
-public class Classification<T, K> {
+public class Classification<T, K> implements Serializable{
 
+    private static final long serialVersionUID = -6932524291591376453L;
     /**
      * The classified featureset.
      */
