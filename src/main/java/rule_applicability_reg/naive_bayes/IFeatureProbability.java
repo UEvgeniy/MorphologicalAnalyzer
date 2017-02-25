@@ -1,4 +1,4 @@
-package bin_class_approach.naive_bayes;
+package rule_applicability_reg.naive_bayes;
 
 /**
  * Simple interface defining the method to calculate the feature probability.

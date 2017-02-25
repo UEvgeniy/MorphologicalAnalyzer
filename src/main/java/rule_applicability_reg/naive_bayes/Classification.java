@@ -1,4 +1,4 @@
-package bin_class_approach.naive_bayes;
+package rule_applicability_reg.naive_bayes;
 
 import java.io.Serializable;
 import java.util.Collection;

@@ -1,12 +1,10 @@
-package bin_class_approach.naive_bayes;
+package rule_applicability_reg.naive_bayes;
 
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.SortedSet;
 import java.util.TreeSet;
-
-import bin_class_approach.naive_bayes.*;
 
 /**
  * A concrete implementation of the abstract Classifier class.  The Bayes

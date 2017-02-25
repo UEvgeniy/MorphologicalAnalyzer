@@ -1,13 +1,7 @@
-package bin_class_approach.naive_bayes;
+package rule_applicability_reg.naive_bayes;
 
 import java.io.Serializable;
-import java.util.Collection;
-import java.util.Dictionary;
-import java.util.Enumeration;
-import java.util.Hashtable;
-import java.util.LinkedList;
-import java.util.Queue;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Abstract base extended by any concrete naive_bayes. It implements the basic
@@ -376,7 +370,7 @@ public abstract class Classifier<T, K> implements IFeatureProbability<T, K>, Ser
      * @return The weighed average probability.
      */
     public float featureWeighedAverage(T feature, K category, IFeatureProbability<T, K> calculator, float weight,
-            float assumedProbability) {
+                                       float assumedProbability) {
 
         /*
          * use the given calculating object or the default method to calculate

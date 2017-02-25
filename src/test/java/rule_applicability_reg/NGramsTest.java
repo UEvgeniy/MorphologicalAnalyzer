@@ -1,6 +1,5 @@
-package bin_class_approach;
+package rule_applicability_reg;
 
-import helpers.SuffixesHelper;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 

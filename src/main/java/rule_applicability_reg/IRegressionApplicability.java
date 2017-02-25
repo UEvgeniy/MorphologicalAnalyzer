@@ -1,19 +1,20 @@
-package bin_class_approach;
+package rule_applicability_reg;
 
-import datamodel.ILemmaRule;
-import datamodel.LemmaRule;
 import datamodel.MorphemedWord;
+
+import java.util.Collection;
 
 /**
  * An interface for making decision about the applicability of the rule for the word
  */
-interface IClassifierApplicability {
+interface IRegressionApplicability {
 
     /**
      * For word with extracted morphemes define the applicability of the rule.
      * @param word word with extracted morphemes.
-     * @param rule rule that may be applied to the word.
      * @return True, if it is possible to apply rule to word. False, if not.
      */
-    boolean isApplicable(MorphemedWord word, ILemmaRule rule);
+    double isApplicable(MorphemedWord word);
+
+    void train(Collection<String> features, Boolean category);
 }

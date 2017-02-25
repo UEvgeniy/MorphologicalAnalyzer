@@ -22,7 +22,7 @@ public class DatasetConverter {
         return resultRules;
     }
 
-    public static Set<IMorpheme> formMorphemes(Collection<IWord> words){
+    public static Set<IMorpheme> collectMorphemes(Collection<IWord> words){
 
         Set<IMorpheme> resultMorphemes = new HashSet<>();
 

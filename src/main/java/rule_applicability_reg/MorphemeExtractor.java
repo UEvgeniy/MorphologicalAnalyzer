@@ -1,4 +1,4 @@
-package baseline;
+package rule_applicability_reg;
 
 import datamodel.IMorpheme;
 import datamodel.Morpheme;
@@ -12,12 +12,14 @@ import java.util.*;
  */
 class MorphemeExtractor implements Serializable {
 
-    private static final long serialVersionUID = 6783132388005782383L;
+
+    private static final long serialVersionUID = -1139787217716018414L;
     private final Set<IMorpheme> morphemes;
 
     MorphemeExtractor(Set<IMorpheme> morphemes){
 
-        this.morphemes = Objects.requireNonNull(morphemes, "Collection of morphemes cannot be null");
+        this.morphemes = Objects.requireNonNull(morphemes,
+                "Collection of morphemes cannot be null");
     }
 
     /**
@@ -32,14 +34,15 @@ class MorphemeExtractor implements Serializable {
         for (IMorpheme m : morphemes ){
             if (word.endsWith(m.getText())){
 
-                IMorpheme root = new Morpheme(word.substring(0, word.length() - m.getText().length()));
+                IMorpheme root =
+                        new Morpheme(word.substring(0,
+                                word.length() - m.getText().length()));
 
                 List<IMorpheme> morphemes = new ArrayList<>();
                 morphemes.add(root);
                 morphemes.add(m);
 
                 MorphemedWord mWord = new MorphemedWord(morphemes);
-
                 result.add(mWord);
 
             }

@@ -1,14 +1,13 @@
 package ru.ispras;
 
 import analyzers.IMorphAnalyzer;
-import baseline.MorphAnalyzerTrainer;
-import bin_class_approach.RulesApplicabilityFactory;
 import datamodel.IDataset;
 import datamodel.IWord;
 import datamodel.Word;
 import factories.*;
 import helpers.FileSearcher;
 import maslov_segalovich_based.MSFactory;
+import rule_applicability_reg.BayesRuleApplicabilityFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -26,21 +25,19 @@ public class Main {
 
         IDatasetParser parser = new RusCorporaParser(new File("D:/dict/texts"));
 
-        IMorphAnalyzerFactory fact = new RulesApplicabilityFactory(parser.getDataset());
+        IMorphAnalyzerFactory fact = new BayesRuleApplicabilityFactory(parser.getDataset());
 
         File analyzer = new File("D:/dict/rules.nlzr");
 
-
-
-        IMorphAnalyzer my = null;
-        try {
+        IMorphAnalyzer my = fact.create();
+        /*try {
             //my = new MorphAnalyzerSaver(fact, analyzer.toPath()).create();
-            my = new MorphAnalyzerLoader(analyzer.toPath()).create();
+
         } catch (IOException e) {
             System.out.println(e.getMessage());
             return;
         }
-
+*/
         tryAnalyze(my, words);
     }
 
@@ -90,8 +87,7 @@ public class Main {
 
         IDatasetParser parser = new RusCorporaParser(null);
 
-        // Baseline implementation of Morpheme Extractor and Property Predictor
-        IMorphAnalyzerFactory mbma = new MorphAnalyzerTrainer(parser);
+
 
         try {
 
@@ -106,7 +102,7 @@ public class Main {
 
             // Order of arguments in constructor is IMPORTANT!
             // Swap arguments and analyzer behavior may be changed.
-            CompositeMorphAnalyzerFactory comp = new CompositeMorphAnalyzerFactory(loader, mbma);
+            CompositeMorphAnalyzerFactory comp = new CompositeMorphAnalyzerFactory(loader);
 
             IMorphAnalyzer analyzer = comp.create();
 
