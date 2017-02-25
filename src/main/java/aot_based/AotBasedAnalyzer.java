@@ -1,6 +1,7 @@
 package aot_based;
 
 import analyzers.IMorphAnalyzer;
+import datamodel.IDataset;
 import datamodel.IWord;
 import datamodel.Word;
 import helpers.SuffixesHelper;
@@ -19,8 +20,8 @@ public class AotBasedAnalyzer implements IMorphAnalyzer, Serializable {
     private static final long serialVersionUID = -1781794547268400899L;
     private final Set<IWord> dictionary;
 
-    public AotBasedAnalyzer(Set<IWord> dictionary) {
-        this.dictionary = Objects.requireNonNull(dictionary);
+    public AotBasedAnalyzer(IDataset dictionary) {
+        this.dictionary = Objects.requireNonNull(dictionary.get());
     }
 
     @Override

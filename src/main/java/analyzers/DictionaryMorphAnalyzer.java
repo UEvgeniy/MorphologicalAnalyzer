@@ -1,5 +1,6 @@
 package analyzers;
 
+import datamodel.IDataset;
 import datamodel.IWord;
 
 import java.io.Serializable;
@@ -16,9 +17,10 @@ public class DictionaryMorphAnalyzer implements IMorphAnalyzer, Serializable {
     private static final long serialVersionUID = -760462216430499658L;
     private Set<IWord> dictionary;
 
-    public DictionaryMorphAnalyzer(Set<IWord> dictionary){
+    public DictionaryMorphAnalyzer(IDataset dictionary){
 
-        this.dictionary = Objects.requireNonNull(dictionary, "Dictionary cannot be empty.");
+        this.dictionary = Objects.requireNonNull(dictionary.get(),
+                "Dictionary cannot be empty.");
     }
 
     @Override

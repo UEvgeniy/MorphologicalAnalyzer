@@ -1,6 +1,7 @@
 package bin_class_approach;
 
 import analyzers.IMorphAnalyzer;
+import datamodel.IDataset;
 import datamodel.IWord;
 import factories.IDatasetParser;
 import factories.IMorphAnalyzerFactory;
@@ -16,17 +17,17 @@ import java.util.Set;
  */
 public class RulesApplicabilityFactory implements IMorphAnalyzerFactory{
 
-    private final IDatasetParser parser;
+    private final IDataset dataset;
 
-    public RulesApplicabilityFactory(IDatasetParser parser){
-        this.parser = Objects.requireNonNull(parser, "Parser cannot be null.");
+    public RulesApplicabilityFactory(IDataset dictionary){
+        this.dataset = Objects.requireNonNull(dictionary, "Dataset cannot be null.");
 
     }
 
     @Override
     public IMorphAnalyzer create() {
 
-        Set<IWord> words = parser.getDictionary();
+        Set<IWord> words = dataset.get();
 
         IClassifierApplicabilityFactory factory =
                 new BinBayesClassifierFactory(words);

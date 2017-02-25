@@ -1,6 +1,7 @@
 package comparator;
 
 import analyzers.IMorphAnalyzer;
+import datamodel.IDataset;
 import datamodel.IWord;
 import factories.IDatasetParser;
 
@@ -29,17 +30,17 @@ public class AnalyzersComparator {
 
     public void start(PrintStream os){
 
-        Set<IWord> words = parser.getDictionary();
+        IDataset words = parser.getDataset();
 
 
         Set<IWord> train =  new HashSet<>();
         Set<IWord> test = new HashSet<>();
 
-        random_separation(words, train, test, 90);
+        random_separation(words.get(), train, test, 90);
 
         // todo universal solution for initializing different classes
 
-        for (IWord word: words){
+        for (IWord word: words.get()){
             String str = word.getWord();
 
             for (IMorphAnalyzer analyzer: analyzers){

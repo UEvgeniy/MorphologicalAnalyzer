@@ -1,9 +1,9 @@
 package maslov_segalovich_based;
 
 import analyzers.IMorphAnalyzer;
+import datamodel.IDataset;
 import datamodel.IWord;
 import datamodel.Word;
-import factories.IDatasetParser;
 import factories.IMorphAnalyzerFactory;
 import helpers.SuffixesHelper;
 
@@ -16,16 +16,16 @@ import java.util.*;
 public class MSFactory implements IMorphAnalyzerFactory, Serializable{
 
     private static final long serialVersionUID = 3064004026055689999L;
-    private final IDatasetParser parser;
+    private final IDataset dataset;
 
-    public MSFactory(IDatasetParser parser){
-        this.parser = Objects.requireNonNull(parser);
+    public MSFactory(IDataset dictionary){
+        this.dataset = Objects.requireNonNull(dictionary);
     }
 
     @Override
     public IMorphAnalyzer create() {
 
-        Set<IWord> dict =  parser.getDictionary();
+        Set<IWord> dict =  dataset.get();
 
 
         Map<String, Integer> frequency = new HashMap<>();

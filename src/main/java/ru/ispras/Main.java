@@ -1,11 +1,9 @@
 package ru.ispras;
 
 import analyzers.IMorphAnalyzer;
-import aot_based.AotBasedFactory;
 import baseline.MorphAnalyzerTrainer;
 import bin_class_approach.RulesApplicabilityFactory;
-import bin_class_approach.naive_bayes.Classification;
-import bin_class_approach.naive_bayes.BayesClassifier;
+import datamodel.IDataset;
 import datamodel.IWord;
 import datamodel.Word;
 import factories.*;
@@ -28,7 +26,7 @@ public class Main {
 
         IDatasetParser parser = new RusCorporaParser(new File("D:/dict/texts"));
 
-        IMorphAnalyzerFactory fact = new RulesApplicabilityFactory(parser);
+        IMorphAnalyzerFactory fact = new RulesApplicabilityFactory(parser.getDataset());
 
         File analyzer = new File("D:/dict/rules.nlzr");
 
@@ -64,7 +62,7 @@ public class Main {
 
         IDatasetParser parser = new RusCorporaParser(null);
 
-        IMorphAnalyzerFactory segFact = new MSFactory(parser);
+        IMorphAnalyzerFactory segFact = new MSFactory(parser.getDataset());
 
         try {
             IMorphAnalyzerFactory saver = new MorphAnalyzerSaver(segFact, saveTo);
@@ -98,7 +96,8 @@ public class Main {
         try {
 
             // Parse dictionary and save it
-            IMorphAnalyzerFactory dictFactory = new DictionaryFactory(dict);
+            IDataset dataset = new RusCorporaParser(dict).getDataset();
+            IMorphAnalyzerFactory dictFactory = new DictionaryFactory(dataset);
             IMorphAnalyzerFactory saver = new MorphAnalyzerSaver(dictFactory, saveTo.toPath());
             saver.create();
 

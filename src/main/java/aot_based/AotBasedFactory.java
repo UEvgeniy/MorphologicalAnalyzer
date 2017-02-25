@@ -1,6 +1,7 @@
 package aot_based;
 
 import analyzers.IMorphAnalyzer;
+import datamodel.IDataset;
 import factories.IDatasetParser;
 import factories.IMorphAnalyzerFactory;
 
@@ -11,15 +12,15 @@ import java.util.Objects;
  */
 public class AotBasedFactory implements IMorphAnalyzerFactory{
 
-    private final IDatasetParser parser;
+    private final IDataset dataset;
 
-    public AotBasedFactory(IDatasetParser parser){
-        this.parser = Objects.requireNonNull(parser);
+    public AotBasedFactory(IDataset dictionary){
+        this.dataset = Objects.requireNonNull(dictionary);
     }
 
 
     @Override
     public IMorphAnalyzer create() {
-        return new AotBasedAnalyzer(parser.getDictionary());
+        return new AotBasedAnalyzer(dataset);
     }
 }

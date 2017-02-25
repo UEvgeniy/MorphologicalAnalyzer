@@ -2,6 +2,7 @@ package factories;
 
 import analyzers.DictionaryMorphAnalyzer;
 import analyzers.IMorphAnalyzer;
+import datamodel.IDataset;
 import datamodel.IWord;
 import helpers.FileSearcher;
 
@@ -13,18 +14,15 @@ import java.util.*;
  */
 public class DictionaryFactory implements IMorphAnalyzerFactory {
 
-    private File file;
+    private final IDataset dataset;
 
-    public DictionaryFactory(File dataset) {
-        file = Objects.requireNonNull(dataset, "Data set cannot be null.");
+    public DictionaryFactory(IDataset dictionary) {
+        dataset = Objects.requireNonNull(dictionary, "Data set cannot be null.");
     }
 
     @Override
     public IMorphAnalyzer create() {
 
-        RusCorporaParser parser = new RusCorporaParser(file);
-        HashSet<IWord> words = parser.getDictionary();
-
-        return new DictionaryMorphAnalyzer(words);
+        return new DictionaryMorphAnalyzer(dataset);
     }
 }

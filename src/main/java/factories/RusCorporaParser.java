@@ -1,5 +1,7 @@
 package factories;
 
+import datamodel.DataSet;
+import datamodel.IDataset;
 import datamodel.IWord;
 import datamodel.Word;
 import helpers.FileSearcher;
@@ -28,7 +30,7 @@ public class RusCorporaParser implements IDatasetParser{
 
     
     @Override
-    public HashSet<IWord> getDictionary(){
+    public IDataset getDataset(){
 
         HashSet<IWord> words = new HashSet<>();
 
@@ -39,7 +41,7 @@ public class RusCorporaParser implements IDatasetParser{
             );
         }
 
-        return words;
+        return new DataSet(words);
     }
 
     /**

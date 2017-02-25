@@ -1,6 +1,7 @@
 package baseline;
 
 import analyzers.IMorphAnalyzer;
+import datamodel.IDataset;
 import datamodel.IWord;
 import factories.IDatasetParser;
 import factories.IMorphAnalyzerFactory;
@@ -22,12 +23,12 @@ public class MorphAnalyzerTrainer implements IMorphAnalyzerFactory {
     @Override
     public IMorphAnalyzer create() {
 
-        Set<IWord> words = parser.getDictionary();
+        IDataset words = parser.getDataset();
 
         IPropertyPredictorFactory propertyPredictorFactory =
-                new TrivialLemmaRulePropertyPredictorTrainer(words);
+                new TrivialLemmaRulePropertyPredictorTrainer(words.get());
 
-        MorphemeExtractorTrainer morphemeExtractorTrainer = new MorphemeExtractorTrainer(words);
+        MorphemeExtractorTrainer morphemeExtractorTrainer = new MorphemeExtractorTrainer(words.get());
 
         return new MorphemeBasedMorphAnalyzer(
                 morphemeExtractorTrainer.train(),
