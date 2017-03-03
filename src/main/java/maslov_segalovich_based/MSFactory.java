@@ -52,7 +52,7 @@ public class MSFactory implements IMorphAnalyzerFactory, Serializable{
             // Add new record to the sorted set
             sortedSet.add(new Lexeme(
                     basis,
-                    new Word(lemma, lemma, iWord.getProperties()),
+                    new Word(lemma, lemma, iWord.getProperties().get()),
                     frequency.get(lemma)
             ));
 

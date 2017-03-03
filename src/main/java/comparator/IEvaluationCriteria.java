@@ -9,5 +9,5 @@ import java.util.Collection;
  */
 public interface IEvaluationCriteria {
 
-   void evaluate(Collection<IWord> suggested, Collection<IWord> actual);
+   QualityResult evaluate(Collection<IWord> suggested, Collection<IWord> actual);
 }

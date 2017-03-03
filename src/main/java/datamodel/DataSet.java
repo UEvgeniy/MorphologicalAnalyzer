@@ -20,7 +20,7 @@ public class DataSet implements  IDataset{
     }
 
     @Override
-    public List<IDataset> split(int percentage) {
+    public List<IDataset> split(double percentage) {
         if (percentage < 0 || percentage > 100) {
             throw new IllegalArgumentException
                     ("Percentage must be in range [0; 100]");
@@ -30,7 +30,7 @@ public class DataSet implements  IDataset{
         Set<IWord> test = new HashSet<>();
 
         Random random = new Random();
-        double p = (double)percentage / 100;
+        double p = percentage / 100;
 
         for( IWord word: dictionary){
             if (random.nextDouble() < p){
@@ -47,5 +47,10 @@ public class DataSet implements  IDataset{
         result.add(new DataSet(test));
 
         return result;
+    }
+
+    @Override
+    public int size() {
+        return dictionary.size();
     }
 }

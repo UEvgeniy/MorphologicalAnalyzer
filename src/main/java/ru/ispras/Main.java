@@ -1,6 +1,11 @@
 package ru.ispras;
 
 import analyzers.IMorphAnalyzer;
+import aot_based.AotBasedFactory;
+import comparator.AnalyzersComparator;
+import comparator.EvaluationCriteria;
+import comparator.IEvaluationCriteria;
+import comparator.QualityResult;
 import datamodel.IDataset;
 import datamodel.IWord;
 import datamodel.Word;
@@ -11,6 +16,8 @@ import rule_applicability_reg.BayesRuleApplicabilityFactory;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Path;
 import java.util.*;
 
@@ -18,7 +25,51 @@ public class Main {
 
     public static void main(String[] args) {
 
-        binClassApr();
+        /*IDataset dataset = new RusCorporaParser(new File("D:/dict")).getDataset();
+
+        AotBasedFactory fact = new AotBasedFactory(dataset);
+
+        IMorphAnalyzer analyzer = fact.create();
+
+        tryAnalyze(analyzer, words);*/
+        comparatorExample();
+    }
+
+    private static void comparatorExample() {
+        IEvaluationCriteria criteria = new EvaluationCriteria();
+
+        IDataset dataset = new RusCorporaParser(new File("D:/dict")).getDataset();
+
+        List<IDataset> splitted = dataset.split(99.9);
+
+        Set<Constructor> factories = new HashSet<>();
+        try {
+            factories.add(AotBasedFactory.class.getConstructor(IDataset.class));
+            factories.add(BayesRuleApplicabilityFactory.class.getConstructor(IDataset.class));
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        }
+
+        try {
+            AnalyzersComparator comp =
+                    new AnalyzersComparator(
+                            factories,
+                            splitted.get(0),
+                            splitted.get(1),
+                            criteria);
+
+            Map<IMorphAnalyzer, QualityResult> res = comp.start();
+
+            for (Map.Entry<IMorphAnalyzer, QualityResult> entry : res.entrySet()){
+                System.out.println(entry.getKey().getClass().getName() + ":");
+                System.out.println(entry.getValue().getInfo());
+            }
+
+        } catch (IllegalAccessException |
+                InvocationTargetException |
+                InstantiationException e) {
+            e.printStackTrace();
+        }
     }
 
     private static void binClassApr(){
@@ -127,7 +178,7 @@ public class Main {
                 Collection<IWord> answers = an.analyze(word);
                 System.out.println("WORD: " + word);
                 for (IWord w : answers) {
-                    System.out.println("\tLEMMA: " + w.getLemma() + "\tPROPS: " + w.getProperties());
+                    System.out.println("\tLEMMA: " + w.getLemma() + "\tPROPS: " + w.getProperties().get());
                 }
             } else {
                 System.out.println("Word " + word + "\n\tcannot be analyzed");

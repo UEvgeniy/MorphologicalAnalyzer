@@ -9,6 +9,7 @@ import java.util.Set;
 public interface IDataset {
 
     Set<IWord> get();
-    List<IDataset> split(int percentage);
+    List<IDataset> split(double percentage);
+    int size();
 
 }

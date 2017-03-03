@@ -1,13 +1,16 @@
 package comparator;
 
 import analyzers.IMorphAnalyzer;
+import aot_based.AotBasedFactory;
 import datamodel.IDataset;
 import datamodel.IWord;
 import factories.IDatasetParser;
-
+import factories.IMorphAnalyzerFactory;
 
 
 import java.io.PrintStream;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
 
@@ -17,68 +20,75 @@ import java.util.*;
 public class AnalyzersComparator {
 
     private final List<IMorphAnalyzer> analyzers;
-    private final IDatasetParser parser;
+
+    private final Map<String, Collection<IWord>> test;
     private final IEvaluationCriteria criteria;
 
-    public AnalyzersComparator(List<IMorphAnalyzer> analyzers,
-                               IDatasetParser parser, IEvaluationCriteria criteria){
-        this.analyzers = Objects.requireNonNull(analyzers);
-        this.parser = Objects.requireNonNull(parser);
+    public AnalyzersComparator(Collection<Constructor> factories,
+                               IDataset train, IDataset test, IEvaluationCriteria criteria)
+            throws IllegalAccessException, InvocationTargetException, InstantiationException {
+
+        analyzers = new ArrayList<>();
+
+        for (Constructor c : factories) {
+            analyzers.add(((IMorphAnalyzerFactory) c.newInstance(train)).create());
+
+        }
+
+        this.test = Objects.requireNonNull(formTestData(test));
         this.criteria = Objects.requireNonNull(criteria);
     }
 
 
-    public void start(PrintStream os){
+    public Map<IMorphAnalyzer, QualityResult> start() {
 
-        IDataset words = parser.getDataset();
+        Map<IMorphAnalyzer, QualityResult> res = new HashMap<>();
 
+        for (IMorphAnalyzer analyzer : analyzers){
 
-        Set<IWord> train =  new HashSet<>();
-        Set<IWord> test = new HashSet<>();
-
-        random_separation(words.get(), train, test, 90);
-
-        // todo universal solution for initializing different classes
-
-        for (IWord word: words.get()){
-            String str = word.getWord();
-
-            for (IMorphAnalyzer analyzer: analyzers){
-                Collection<IWord> suggested = analyzer.analyze(str);
-
-                // todo form map<String, Collection<IWords>>
-                criteria.evaluate(suggested, null);
-
-            }
+            res.put(analyzer, getQuality(analyzer));
         }
 
+        return res;
 
     }
 
-    // Not accurate for small sets
-    private static void random_separation(Set<IWord> source,
-                                          Set<IWord> train,
-                                          Set<IWord> test,
-                                          int percentage){
-        if (percentage < 0 || percentage > 100){
-            throw new IllegalArgumentException
-                    ("Percentage must be in range [0; 100]");
+    private QualityResult getQuality(IMorphAnalyzer analyzer){
+
+        double result_acc = 0;
+        double result_rec = 0;
+        Collection<IWord> difWords = new HashSet<>();
+
+        for (Map.Entry<String, Collection<IWord>> entry : test.entrySet()){
+
+            QualityResult forWord = criteria.evaluate(
+                    analyzer.analyze(entry.getKey()),
+                    entry.getValue());
+
+            result_acc += forWord.getAccuracy();
+            result_rec += forWord.getRecall();
+            difWords.addAll(forWord.getDifficultWords());
         }
 
-        Objects.requireNonNull(source);
-        Objects.requireNonNull(train);
-        Objects.requireNonNull(test);
+        return new QualityResult(result_acc / test.size(),
+                result_rec / test.size(), difWords);
+    }
 
-        List<IWord> list = new ArrayList<>(source);
-        Random rnd = new Random();
 
-        for (IWord aList : list) {
-            if (rnd.nextDouble() < ((float) percentage / 100)) {
-                source.add(aList);
-            } else {
-                test.add(aList);
+
+    private Map<String, Collection<IWord>> formTestData(IDataset test){
+
+        Map<String, Collection<IWord>> result = new HashMap<>();
+
+        for (IWord word : test.get()){
+
+            if (!result.containsKey(word.getWord())){
+                result.put(word.getWord(), new HashSet<>());
             }
+
+            result.get(word.getWord()).add(word);
         }
 
+        return result;
     }
 }

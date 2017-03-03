@@ -8,6 +8,6 @@ public interface IMorphProperties {
      *
      * @return String representation of properties
      */
-    String getProperties();
+    String get();
     // todo String getPoS(); may be useful soon...
 }

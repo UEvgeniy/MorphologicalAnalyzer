@@ -3,16 +3,23 @@ package datamodel;
 
 import java.io.Serializable;
 import java.util.Objects;
+import java.util.Properties;
 
 public class Word implements IWord, Serializable {
 
     private static final long serialVersionUID = -2599795694043548965L;
-    private final String word, lemma, properties;
+    private final String word, lemma;
+    //private final IMorphProperties properties;
+    private final IMorphProperties properties;
 
-    public Word(String word, String lemma, String properties){
+    public Word(String word, String lemma, IMorphProperties properties){
         this.word = word;
         this.lemma = lemma;
         this.properties = properties;
+    }
+
+    public Word(String word, String lemma, String properties){
+        this(word, lemma, new MorphProperties(properties));
     }
 
     @Override
@@ -26,7 +33,7 @@ public class Word implements IWord, Serializable {
     }
 
     @Override
-    public String getProperties() {
+    public IMorphProperties getProperties() {
         return properties;
     }
 

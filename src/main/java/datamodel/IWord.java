@@ -18,5 +18,5 @@ public interface IWord {
     /**
      * @return String representation of properties
      */
-    String getProperties();
+    IMorphProperties getProperties();
 }

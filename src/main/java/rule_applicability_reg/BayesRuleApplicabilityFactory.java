@@ -63,7 +63,7 @@ public class BayesRuleApplicabilityFactory implements IMorphAnalyzerFactory{
             ExtendedLemmaRule elr = new ExtendedLemmaRule(
                     word.getWord().substring(comPref),
                     word.getLemma().substring(comPref),
-                    word.getProperties(),
+                    word.getProperties().get(),
                     new BayesRegression());
 
             result.get(end).add(elr);
@@ -95,13 +95,13 @@ public class BayesRuleApplicabilityFactory implements IMorphAnalyzerFactory{
 
 
             for (ExtendedLemmaRule rule: possibleRules){
-                if (rule.getMorphProperties().equals(word.getProperties())){
-                    rule.train(mWord, word.getProperties());
+                if (rule.getMorphProperties().equals(word.getProperties().get())){
+                    rule.train(mWord, word.getProperties().get());
                 }
                 else{
                     if (possibleRules.size() < 5
-                            || rnd.nextDouble() < (double)10 / possibleRules.size()) {
-                        rule.train(mWord, word.getProperties());
+                            || rnd.nextDouble() < (double)3 / possibleRules.size()) {
+                        rule.train(mWord, word.getProperties().get());
                     }
                 }
             }

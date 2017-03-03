@@ -49,7 +49,7 @@ public class MSAnalyzer implements IMorphAnalyzer, Serializable {
                         new Word(
                                 word,
                                 sub + lex.getLexeme().getWord().substring(lex.getBasis().length()),
-                                lex.getLexeme().getProperties()
+                                lex.getLexeme().getProperties().get()
                         )
                 );
             }
