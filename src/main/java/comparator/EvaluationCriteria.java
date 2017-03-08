@@ -6,6 +6,7 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Simple class of comparing expected and actual answers
@@ -14,29 +15,30 @@ public class EvaluationCriteria implements IEvaluationCriteria {
 
 
     @Override
-    public QualityResult evaluate(Collection<IWord> suggested, Collection<IWord> actual) {
+    public QualityResult evaluate(Set<IWord> predicted, Set<IWord> correct) {
 
-        StringBuilder result = new StringBuilder();
 
-        if (suggested.isEmpty()){
-            return new QualityResult(0, 0, actual);
+        if (predicted.isEmpty()){
+            return new QualityResult(0, 0, correct);
         }
 
-        int correct = 0;
+        int counter = 0;
 
-        Collection<IWord> difficultWords = new ArrayList<>();
+        Set<IWord> difficultWords = new HashSet<>();
 
-        for (IWord word : actual){
-            if (suggested.contains(word))
-                correct ++;
+        for (IWord word : predicted){
+            if (correct.contains(word))
+                counter ++;
             else{
                 difficultWords.add(word);
             }
         }
 
+
+
         return new QualityResult(
-                (double) correct / suggested.size(),
-                (double) correct / actual.size(),
+                (double) counter / predicted.size(),
+                (double) counter / correct.size(),
                 difficultWords);
     }
 }

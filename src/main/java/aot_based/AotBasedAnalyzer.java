@@ -7,10 +7,7 @@ import datamodel.Word;
 import helpers.SuffixesHelper;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 /**
  * This approach based on http://www.aot.ru/docs/sokirko/Dialog2004.htm description
@@ -25,7 +22,7 @@ public class AotBasedAnalyzer implements IMorphAnalyzer, Serializable {
     }
 
     @Override
-    public Collection<IWord> analyze(String word) {
+    public Set<IWord> analyze(String word) {
 
         short longestSuffix = 0;
         short wordLemmaDif = 0;
@@ -64,7 +61,7 @@ public class AotBasedAnalyzer implements IMorphAnalyzer, Serializable {
 
 
 
-        Collection<IWord> result = new ArrayList<>();
+        Set<IWord> result = new HashSet<>();
 
         if (bestCoincidence != null){
 

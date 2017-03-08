@@ -1,14 +1,14 @@
 package ru.ispras;
 
 import analyzers.IMorphAnalyzer;
+import aot_based.AotBasedAnalyzer;
 import aot_based.AotBasedFactory;
-import comparator.AnalyzersComparator;
+import comparator.QualityAssessment;
 import comparator.EvaluationCriteria;
 import comparator.IEvaluationCriteria;
 import comparator.QualityResult;
 import datamodel.IDataset;
 import datamodel.IWord;
-import datamodel.Word;
 import factories.*;
 import helpers.FileSearcher;
 import maslov_segalovich_based.MSFactory;
@@ -20,6 +20,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Path;
 import java.util.*;
+import java.util.function.Function;
 
 public class Main {
 
@@ -32,7 +33,11 @@ public class Main {
         IMorphAnalyzer analyzer = fact.create();
 
         tryAnalyze(analyzer, words);*/
+
         comparatorExample();
+
+
+        //comparatorExample();
     }
 
     private static void comparatorExample() {
@@ -40,39 +45,31 @@ public class Main {
 
         IDataset dataset = new RusCorporaParser(new File("D:/dict")).getDataset();
 
-        List<IDataset> splitted = dataset.split(99);
+        List<IDataset> splitted = dataset.split(99, new Random(0));
 
-        Set<Constructor> factories = new HashSet<>();
-        try {
-            factories.add(AotBasedFactory.class.getConstructor(IDataset.class));
-            factories.add(BayesRuleApplicabilityFactory.class.getConstructor(IDataset.class));
-        } catch (NoSuchMethodException e) {
-            e.printStackTrace();
+        Collection<Function<IDataset, IMorphAnalyzer>> funcs =
+                new ArrayList<>();
+
+        funcs.add(iDataset -> new AotBasedFactory(iDataset).create());
+        //funcs.add(iDataset -> new BayesRuleApplicabilityFactory(iDataset).create());
+
+        QualityAssessment assessment = new QualityAssessment(
+                funcs,
+                splitted.get(0),
+                splitted.get(1),
+                criteria);
+
+
+        Map<IMorphAnalyzer, QualityResult> res = assessment.start();
+
+        for (Map.Entry<IMorphAnalyzer, QualityResult> entry : res.entrySet()) {
+            System.out.println(entry.getKey().getClass().getName() + ":");
+            System.out.println(entry.getValue().getInfo());
         }
 
-        try {
-            AnalyzersComparator comp =
-                    new AnalyzersComparator(
-                            factories,
-                            splitted.get(0),
-                            splitted.get(1),
-                            criteria);
-
-            Map<IMorphAnalyzer, QualityResult> res = comp.start();
-
-            for (Map.Entry<IMorphAnalyzer, QualityResult> entry : res.entrySet()){
-                System.out.println(entry.getKey().getClass().getName() + ":");
-                System.out.println(entry.getValue().getInfo());
-            }
-
-        } catch (IllegalAccessException |
-                InvocationTargetException |
-                InstantiationException e) {
-            e.printStackTrace();
-        }
     }
 
-    private static void binClassApr(){
+    private static void binClassApr() {
 
         IDatasetParser parser = new RusCorporaParser(new File("D:/dict/texts"));
 
@@ -93,7 +90,7 @@ public class Main {
     }
 
     private static String[] words = {
-            "гоношилась", "подошел", "невпечатляющих","коготочка",
+            "гоношилась", "подошел", "невпечатляющих", "коготочка",
             "гаманка",      // based on "наркоманка" expected "гаманок"
             "шуфлядки",     // based on "оглядки"
             "млявого",      // based on "кудрявого"
@@ -102,8 +99,7 @@ public class Main {
     };
 
 
-
-    private static void testSegalovich(){
+    private static void testSegalovich() {
         Path saveTo = new File("D://dict/aot.nlzr").toPath();
 
         List<File> dict = FileSearcher.getFileList(new File("D://dict"), ".xhtml");
@@ -126,7 +122,7 @@ public class Main {
         }
     }
 
-    private static void testAllAnalyzers(){
+    private static void testAllAnalyzers() {
         // A .xhtml file or folder containing .xhtml files (RusCorpora)
         final File dict = new File("D://dict");
 
@@ -137,7 +133,6 @@ public class Main {
         //IMorphAnalyzerFactory fact42 = veryPlainAnalyzer();
 
         IDatasetParser parser = new RusCorporaParser(null);
-
 
 
         try {
@@ -171,9 +166,9 @@ public class Main {
         }
     }
 
-    private static void tryAnalyze(IMorphAnalyzer an, String... words){
+    private static void tryAnalyze(IMorphAnalyzer an, String... words) {
 
-        for (String word: words) {
+        for (String word : words) {
             if (an.canHandle(word)) {
                 Collection<IWord> answers = an.analyze(word);
                 System.out.println("WORD: " + word);
@@ -185,23 +180,4 @@ public class Main {
             }
         }
     }
-
-    // This analyzer has no use and was created only for demonstration of CompositeAnalyzer
-    private static IMorphAnalyzerFactory veryPlainAnalyzer(){
-
-        return () -> new IMorphAnalyzer() {
-            @Override
-            public Collection<IWord> analyze(String word) {
-                ArrayList<IWord> res = new ArrayList<>();
-                res.add(new Word(word, "42", "42"));
-                return res;
-            }
-
-            @Override
-            public Boolean canHandle(String word) {
-                return (word.length() % 2) == 0;
-            }
-        };
-    }
-
 }

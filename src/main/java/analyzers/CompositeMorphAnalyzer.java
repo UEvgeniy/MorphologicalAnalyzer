@@ -7,6 +7,7 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 /**
  * Morphological analyzer which uses other analyzers
@@ -22,7 +23,7 @@ public class CompositeMorphAnalyzer implements IMorphAnalyzer, Serializable {
 
 
     @Override
-    public Collection<IWord> analyze (String word) {
+    public Set<IWord> analyze (String word) {
 
         // Use the first analyzer which is able to analyze the word
         for (IMorphAnalyzer an : analyzers) {

@@ -4,6 +4,7 @@ package analyzers;
 import datamodel.IWord;
 
 import java.util.Collection;
+import java.util.Set;
 
 
 /**
@@ -15,7 +16,7 @@ public interface IMorphAnalyzer {
      * @param word Analyzed word
      * @return Collection of possible properties of the word
      */
-    Collection<IWord> analyze(String word);
+    Set<IWord> analyze(String word);
 
     /**
      * Method checks the possibility of analyzing the word

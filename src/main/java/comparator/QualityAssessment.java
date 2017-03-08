@@ -1,38 +1,36 @@
 package comparator;
 
 import analyzers.IMorphAnalyzer;
-import aot_based.AotBasedFactory;
 import datamodel.IDataset;
 import datamodel.IWord;
-import factories.IDatasetParser;
 import factories.IMorphAnalyzerFactory;
 
 
-import java.io.PrintStream;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
+import java.util.function.Function;
 
 
 /**
  * A tool for comparing analyzers
  */
-public class AnalyzersComparator {
+public class QualityAssessment {
 
     private final List<IMorphAnalyzer> analyzers;
 
-    private final Map<String, Collection<IWord>> test;
+    private final Map<String, Set<IWord>> test;
     private final IEvaluationCriteria criteria;
 
-    public AnalyzersComparator(Collection<Constructor> factories,
-                               IDataset train, IDataset test, IEvaluationCriteria criteria)
-            throws IllegalAccessException, InvocationTargetException, InstantiationException {
+    public QualityAssessment(Collection<Function<IDataset, IMorphAnalyzer>> functions,
+                             IDataset train, IDataset test,
+                             IEvaluationCriteria criteria) {
 
         analyzers = new ArrayList<>();
 
-        for (Constructor c : factories) {
-            analyzers.add(((IMorphAnalyzerFactory) c.newInstance(train)).create());
-
+        // Add analysers to collection
+        for (Function<IDataset, IMorphAnalyzer> func : functions){
+            analyzers.add(func.apply(train));
         }
 
         this.test = Objects.requireNonNull(formTestData(test));
@@ -50,35 +48,34 @@ public class AnalyzersComparator {
         }
 
         return res;
-
     }
 
     private QualityResult getQuality(IMorphAnalyzer analyzer){
 
-        double result_acc = 0;
-        double result_rec = 0;
-        Collection<IWord> difWords = new HashSet<>();
+        double result_precision = 0;
+        double result_recall = 0;
+        Set<IWord> difWords = new HashSet<>();
 
-        for (Map.Entry<String, Collection<IWord>> entry : test.entrySet()){
+        for (Map.Entry<String, Set<IWord>> entry : test.entrySet()){
 
             QualityResult forWord = criteria.evaluate(
                     analyzer.analyze(entry.getKey()),
                     entry.getValue());
 
-            result_acc += forWord.getAccuracy();
-            result_rec += forWord.getRecall();
+            result_precision += forWord.getRecall();
+            result_recall += forWord.getPrecision();
             difWords.addAll(forWord.getDifficultWords());
         }
 
-        return new QualityResult(result_acc / test.size(),
-                result_rec / test.size(), difWords);
+        return new QualityResult(result_precision / test.size(),
+                result_recall / test.size(), difWords);
     }
 
 
 
-    private Map<String, Collection<IWord>> formTestData(IDataset test){
+    private Map<String, Set<IWord>> formTestData(IDataset test){
 
-        Map<String, Collection<IWord>> result = new HashMap<>();
+        Map<String, Set<IWord>> result = new HashMap<>();
 
         for (IWord word : test.get()){
 

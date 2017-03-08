@@ -1,44 +1,42 @@
 package comparator;
 
 import datamodel.IWord;
-
-import java.util.Collection;
 import java.util.Objects;
+import java.util.Set;
 
 /**
  *
  */
 public class QualityResult {
 
-    private final double accuracy;
     private final double recall;
-    private final Collection<IWord> difficultWords;
+    private final double precision;
+    private final Set<IWord> difficultWords;
 
-    public QualityResult(double accuracy, double recall, Collection<IWord> difficultWords){
+    public QualityResult(double precision, double recall, Set<IWord> difficultWords){
 
-        this.accuracy = accuracy;
         this.recall = recall;
+        this.precision = precision;
         this.difficultWords = Objects.requireNonNull(difficultWords);
-
     }
 
-
-    public double getAccuracy() {
-        return accuracy;
-    }
 
     public double getRecall() {
         return recall;
     }
 
-    public Collection<IWord> getDifficultWords() {
+    public double getPrecision() {
+        return precision;
+    }
+
+    public Set<IWord> getDifficultWords() {
         return difficultWords;
     }
 
     public String getInfo(){
         StringBuilder res = new StringBuilder();
 
-        res.append("Accuracy: ").append(accuracy).append("\n")
+        res.append("Precision: ").append(precision).append("\n")
                 .append("Recall: ").append(recall).append("\n")
                 .append("Incorrect predictions for:\n");
         for (IWord word : difficultWords){

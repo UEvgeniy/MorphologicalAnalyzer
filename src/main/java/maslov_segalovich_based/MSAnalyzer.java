@@ -22,11 +22,11 @@ public class MSAnalyzer implements IMorphAnalyzer, Serializable {
 
 
     @Override
-    public Collection<IWord> analyze(String word) {
+    public Set<IWord> analyze(String word) {
 
         short endLen = 0;
 
-        List<IWord> result = new ArrayList<>();
+        Set<IWord> result = new HashSet<>();
 
         short maxSuff = 0;
 
@@ -39,7 +39,7 @@ public class MSAnalyzer implements IMorphAnalyzer, Serializable {
             short commonSuf = SuffixesHelper.getCommonSuffixesLength(sub, list.get(ind).getBasis());
             if (commonSuf > maxSuff){
                 maxSuff = commonSuf;
-                result = new ArrayList<>();
+                result = new HashSet<>();
             }
             if (commonSuf == maxSuff){
 

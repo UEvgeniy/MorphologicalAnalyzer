@@ -24,11 +24,11 @@ public class DictionaryMorphAnalyzer implements IMorphAnalyzer, Serializable {
     }
 
     @Override
-    public Collection<IWord> analyze(String word) {
+    public Set<IWord> analyze(String word) {
         return dictionary
                 .stream()
                 .filter(iWord -> iWord.getWord().equals(word.toLowerCase()))
-                .collect(Collectors.toList());
+                .collect(Collectors.toSet());
     }
 
     @Override

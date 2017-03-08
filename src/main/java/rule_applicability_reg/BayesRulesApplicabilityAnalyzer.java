@@ -30,12 +30,12 @@ public class BayesRulesApplicabilityAnalyzer implements IMorphAnalyzer,Serializa
     }
 
     @Override
-    public Collection<IWord> analyze(String word) {
+    public Set<IWord> analyze(String word) {
 
         // Firstly, try to find some morphemes in the word...
         Collection<MorphemedWord> morphemedWords = morphemeExtractor.extract(word);
 
-        Collection<IWord> result = new ArrayList<>();
+        Set<IWord> result = new HashSet<>();
         Map<ExtendedLemmaRule, Double> probabilities = new LinkedHashMap<>();
 
         // Using extracted morphemes try to define Properties
