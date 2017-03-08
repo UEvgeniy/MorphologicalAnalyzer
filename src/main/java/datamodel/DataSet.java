@@ -20,24 +20,27 @@ public class DataSet implements  IDataset{
     }
 
     @Override
-    public List<IDataset> split(double percentage) {
+    public List<IDataset> split(int percentage, Random random) {
+
         if (percentage < 0 || percentage > 100) {
             throw new IllegalArgumentException
                     ("Percentage must be in range [0; 100]");
         }
 
+        List<IWord> dictionaryList = new ArrayList<>(dictionary);
+        Collections.shuffle(dictionaryList, random);
+
+
         Set<IWord> train = new HashSet<>();
         Set<IWord> test = new HashSet<>();
 
-        Random random = new Random();
-        double p = percentage / 100;
 
-        for( IWord word: dictionary){
-            if (random.nextDouble() < p){
-                train.add(word);
+        for (int i = 0; i < dictionaryList.size(); i++){
+            if (i % 100 < percentage){
+                train.add(dictionaryList.get(i));
             }
             else{
-                test.add(word);
+                test.add(dictionaryList.get(i));
             }
         }
 
@@ -47,6 +50,11 @@ public class DataSet implements  IDataset{
         result.add(new DataSet(test));
 
         return result;
+    }
+
+    @Override
+    public List<IDataset> split(int percentage) {
+        return split(percentage, new Random());
     }
 
     @Override

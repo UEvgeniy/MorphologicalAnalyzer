@@ -40,7 +40,7 @@ public class Main {
 
         IDataset dataset = new RusCorporaParser(new File("D:/dict")).getDataset();
 
-        List<IDataset> splitted = dataset.split(99.9);
+        List<IDataset> splitted = dataset.split(99);
 
         Set<Constructor> factories = new HashSet<>();
         try {

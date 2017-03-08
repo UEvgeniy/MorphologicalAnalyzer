@@ -1,6 +1,7 @@
 package datamodel;
 
 import java.util.List;
+import java.util.Random;
 import java.util.Set;
 
 /**
@@ -9,7 +10,8 @@ import java.util.Set;
 public interface IDataset {
 
     Set<IWord> get();
-    List<IDataset> split(double percentage);
+    List<IDataset> split(int percentage, Random random);
+    List<IDataset> split(int percentage);
     int size();
 
 }
