@@ -17,9 +17,11 @@ public class LemmaRule implements ILemmaRule, Serializable{
     private Collection<IMorpheme> removed;
     private  Collection<IMorpheme> added;
 
-    private String properties;
+    private IMorphProperties properties;
 
-    public LemmaRule(Collection<IMorpheme> removed, Collection<IMorpheme> added, String properties){
+    public LemmaRule(Collection<IMorpheme> removed,
+                     Collection<IMorpheme> added,
+                     IMorphProperties properties){
         this.removed = removed;
         this.added = added;
         this.properties = properties;
@@ -41,7 +43,7 @@ public class LemmaRule implements ILemmaRule, Serializable{
     }
 
     @Override
-    public MorphemedWord apply(MorphemedWord word) {
+    public MorphemedWord formLemma(MorphemedWord word) {
 
         List<IMorpheme> lemmaMorphemes = new ArrayList<>(word.getMorphemes());
 
@@ -57,7 +59,15 @@ public class LemmaRule implements ILemmaRule, Serializable{
     }
 
     @Override
-    public String getMorphProperties() {
+    public IWord apply(MorphemedWord word) {
+        return new Word(
+                word.getWord(),
+                formLemma(word).getWord(),
+                properties);
+    }
+
+    @Override
+    public IMorphProperties getMorphProperties() {
         return properties;
     }
 

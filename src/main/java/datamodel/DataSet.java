@@ -34,9 +34,10 @@ public class DataSet implements  IDataset{
         Set<IWord> train = new HashSet<>();
         Set<IWord> test = new HashSet<>();
 
+        double p = (double)this.size() * percentage / 100;
 
         for (int i = 0; i < dictionaryList.size(); i++){
-            if (i % 100 < percentage){
+            if (i < p){
                 train.add(dictionaryList.get(i));
             }
             else{

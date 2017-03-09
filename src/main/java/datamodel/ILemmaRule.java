@@ -13,14 +13,20 @@ public interface ILemmaRule {
     Boolean isApplicable(MorphemedWord word);
 
     /**
-     * Method applies the rule for the word.
-     * @param word Word with extracted morphemes.
+     * Method applies the rule and form word's lemma.
+     * @param word  with extracted morphemes.
      * @return Word's lemma.
      */
-    MorphemedWord apply(MorphemedWord word);
+    MorphemedWord formLemma(MorphemedWord word);
+
+    /**
+     * Method trasforms word using current lemma rule
+     * @return IWord with word's form, its lemma and morph properties
+     */
+    IWord apply(MorphemedWord word);
 
     /**
      * @return Morphological properties of this lemma rule.
      */
-    String getMorphProperties();
+    IMorphProperties getMorphProperties();
 }

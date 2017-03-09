@@ -11,13 +11,27 @@ import java.util.SortedSet;
 /**
  * Bayes classifier
  */
-class BayesRegression implements IRegressionApplicability, Serializable {
+class BayesClassifierAdapter implements IClassifier, Serializable {
 
     private static final long serialVersionUID = 6152194846914216600L;
     private final BayesClassifier<String, Boolean> bayes;
+    private double lower_bound;
 
-    BayesRegression(){
+    BayesClassifierAdapter(){
         bayes = new BayesClassifier<>();
+        lower_bound = 0;
+    }
+
+    @Override
+    public void setLowerBound(double lower_bound) {
+        this.lower_bound = lower_bound;
+    }
+
+
+
+    @Override
+    public boolean isApplicable(MorphemedWord word) {
+        return getProbability(word) > lower_bound;
     }
 
     public void train(Collection<String> features, Boolean category){
@@ -25,7 +39,8 @@ class BayesRegression implements IRegressionApplicability, Serializable {
     }
 
     @Override
-    public double isApplicable(MorphemedWord word) {
+    public double getProbability(MorphemedWord word) {
+
         SortedSet<Classification<String, Boolean>> result =
                 bayes.classifyDetailed(NGrams.get(word.getRoot(), 2));
 
@@ -37,4 +52,6 @@ class BayesRegression implements IRegressionApplicability, Serializable {
 
         return positive.getProbability();
     }
+
+
 }

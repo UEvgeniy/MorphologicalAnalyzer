@@ -13,30 +13,49 @@ import java.util.stream.Collectors;
  */
 public class BayesRulesApplicabilityAnalyzer implements IMorphAnalyzer,Serializable {
 
-
     private static final long serialVersionUID = 3946708460094173024L;
     private final MorphemeExtractor morphemeExtractor;
     private Map<String, Set<ExtendedLemmaRule>> rules;
 
-
+    /**
+     * Constructor
+     * @param morphemeExtractor a tool for extracting possible morphemes from String
+     * @param rules Map of rules grouped by their removing end from word
+     */
     BayesRulesApplicabilityAnalyzer(MorphemeExtractor morphemeExtractor,
                                     Map<String, Set<ExtendedLemmaRule>> rules){
 
         this.morphemeExtractor = Objects.requireNonNull(morphemeExtractor,
                 "MorphemeExtractor cannot be null");
 
-        this.rules = Objects.requireNonNull(rules);
+        this.rules = Objects.requireNonNull(rules,
+                "Set of rule cannot be null");
 
     }
 
     @Override
     public Set<IWord> analyze(String word) {
 
-        // Firstly, try to find some morphemes in the word...
+        // Firstly, try to find all possible morphemes in the word...
         Collection<MorphemedWord> morphemedWords = morphemeExtractor.extract(word);
 
         Set<IWord> result = new HashSet<>();
-        Map<ExtendedLemmaRule, Double> probabilities = new LinkedHashMap<>();
+
+        // Using extracted morphemes try to define Properties
+        for (MorphemedWord mWord : morphemedWords) {
+
+            Set<ExtendedLemmaRule> possibleRules = rules.get(mWord.getEnding());
+
+            // For each variant of morpheme extraction try to define properties
+            for (ExtendedLemmaRule rule: possibleRules) {
+                if (rule.isApplicable(mWord)){
+                    result.add(rule.apply(mWord));
+                }
+            }
+        }
+
+
+        /*Map<ExtendedLemmaRule, Double> probabilities = new LinkedHashMap<>();
 
         // Using extracted morphemes try to define Properties
         for (MorphemedWord mWord : morphemedWords) {
@@ -64,6 +83,7 @@ public class BayesRulesApplicabilityAnalyzer implements IMorphAnalyzer,Serializa
                 break;
             }
         }
+        */
 
         return result;
     }
@@ -75,7 +95,7 @@ public class BayesRulesApplicabilityAnalyzer implements IMorphAnalyzer,Serializa
      * @param <V> Values
      * @return Sorted map by values (descending)
      */
-    private static Map<ExtendedLemmaRule, Double> sortByValue(Map<ExtendedLemmaRule, Double> map) {
+    /*private static Map<ExtendedLemmaRule, Double> sortByValue(Map<ExtendedLemmaRule, Double> map) {
         return map.entrySet()
                 .stream()
                 .sorted(Map.Entry.comparingByValue(Collections.reverseOrder()))
@@ -85,7 +105,7 @@ public class BayesRulesApplicabilityAnalyzer implements IMorphAnalyzer,Serializa
                         (e1, e2) -> e1,
                         LinkedHashMap::new
                 ));
-    }
+    }*/
 
     @Override
     public Boolean canHandle(String word) {

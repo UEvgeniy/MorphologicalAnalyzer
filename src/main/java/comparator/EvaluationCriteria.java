@@ -26,14 +26,13 @@ public class EvaluationCriteria implements IEvaluationCriteria {
 
         Set<IWord> difficultWords = new HashSet<>();
 
-        for (IWord word : predicted){
-            if (correct.contains(word))
+        for (IWord word : correct){
+            if (predicted.contains(word))
                 counter ++;
             else{
                 difficultWords.add(word);
             }
         }
-
 
 
         return new QualityResult(

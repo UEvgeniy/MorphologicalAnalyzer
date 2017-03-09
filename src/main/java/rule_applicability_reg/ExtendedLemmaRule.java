@@ -1,84 +1,140 @@
 package rule_applicability_reg;
 
 import datamodel.*;
+import helpers.DatasetConverter;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 /**
  * Extended class that use classifier classifier to define applicability
  */
-class ExtendedLemmaRule implements Serializable {
+class ExtendedLemmaRule implements ILemmaRule, Serializable {
 
     private static final long serialVersionUID = -1952315395633816558L;
     private final String removed;
     private final String added;
-    private final String properties;
-    private final IRegressionApplicability classifier;
+    private final IMorphProperties properties;
+    private final IClassifier classifier;
 
-
-
-    ExtendedLemmaRule(String remove, String add, String properties,
-                             IRegressionApplicability classifier) {
+    ExtendedLemmaRule(String remove, String add, IMorphProperties properties,
+                      IClassifier classifier) {
         this.removed = Objects.requireNonNull(remove);
         this.added = Objects.requireNonNull(add);
         this.properties = Objects.requireNonNull(properties);
         this.classifier = Objects.requireNonNull(classifier);
+    }
 
+    @Override
+    public Boolean isApplicable(MorphemedWord word) {
+        return canApply(word) &&
+                classifier.isApplicable(word);
+    }
+
+    @Override
+    public IWord apply(MorphemedWord word) {
+        return new Word(
+                word.getWord(),
+                formLemma(word).getWord(),
+                getMorphProperties());
+    }
+
+    @Override
+    public MorphemedWord formLemma(MorphemedWord word) {
+        if (word.getMorphemes().size() != 2){
+            throw new IllegalArgumentException("Incorrect number of morphemes");
+        }
+        List<IMorpheme> morphemes = new ArrayList<>();
+
+        morphemes.add(new Morpheme(word.getRoot()));
+        morphemes.add(new Morpheme(added));
+
+        return new MorphemedWord(morphemes);
     }
 
 
-    void train(MorphemedWord mWord, String property){
+    @Override
+    public IMorphProperties getMorphProperties() {
+        return properties;
+    }
 
+
+    /**
+     * Training classifier with good & bad examples
+     * @param mWord word with extracted morphemes
+     * @param property morphological properies for the word
+     */
+    void train(MorphemedWord mWord, IMorphProperties property){
 
         // If the basic applicability rule doesn't fit the word,
         //      then classifier classifier would not trained.
-        if (!mWord.getEnding().equals(removed))
-            return;
+        if (!mWord.getEnding().equals(removed)) {
+            throw new IllegalArgumentException
+                    ("Inappropriate word for train:" + mWord.getWord());
+        }
 
         classifier.train(NGrams.get(mWord.getRoot(), 2),
                 property.equals(this.properties));
     }
 
+    /**
+     * Set lower bound of probability
+     * @param bound double probability from 0 to 1
+     */
+    public void setLowerBound(double bound){
+        if (bound > 1 || bound < 0){
+            throw new IllegalArgumentException("Probability cannot be out of [0;1]");
+        }
+        classifier.setLowerBound(bound);
+    }
 
+    /**
+     * Count the probability of applicability rule to the word
+     * @param word word with extracted morphemes
+     * @return double probability from 0 to 1
+     */
     double getProbability(MorphemedWord word){
         if (!word.getEnding().equals(removed)) {
             return 0;
         }
-
-        return classifier.isApplicable(word);
-
+        return classifier.getProbability(word);
     }
 
 
-    IWord apply(String word) {
-
-        // Transform word to its lemma
-        String lemma = word.substring(0, word.length() - removed.length()).concat(added);
-
-        return new Word(word, lemma, properties);
+    /**
+     * Can word be applied to currect rule
+     * @param word word with extracted morphemes
+     * @return True, if word and rule has similar end. If not, False
+     */
+    boolean canApply(MorphemedWord word){
+        return word.getEnding().equals(removed);
     }
 
+    /**
+     * Can word be applied to currect rule
+     * @param word word with extracted morphemes
+     * @return True, if word and rule has similar end. If not, False
+     */
+    boolean fullyApplicable(IWord word){
+        MorphemedWord mWord = DatasetConverter.extractMorphemes(word);
+        return canApply(mWord) &&
+                apply(mWord).equals(word);
+    }
 
-    String getMorphProperties() {
-        return properties;
+    @Override
+    public int hashCode() {
+        return Objects.hash(removed, added, properties);
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof ExtendedLemmaRule)) return false;
-
-        ExtendedLemmaRule lemmaRule = (ExtendedLemmaRule) o;
-
-        if (removed != null ? !removed.equals(lemmaRule.removed) : lemmaRule.removed != null) return false;
-        if (added != null ? !added.equals(lemmaRule.added) : lemmaRule.added != null) return false;
-        return properties != null ? properties.equals(lemmaRule.properties) : lemmaRule.properties == null;
-
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(removed, added, properties);
+        ExtendedLemmaRule that = (ExtendedLemmaRule) o;
+        return Objects.equals(removed, that.removed) &&
+                Objects.equals(added, that.added) &&
+                Objects.equals(properties, that.properties);
     }
 }

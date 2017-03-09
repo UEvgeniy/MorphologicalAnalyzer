@@ -1,6 +1,5 @@
 package datamodel;
 
-import java.lang.reflect.Array;
 import java.util.*;
 
 /**
@@ -8,28 +7,34 @@ import java.util.*;
  */
 public class MorphProperties implements IMorphProperties{
 
-    private String properties;
+    private Set<String> properties;
 
-    public MorphProperties(Set<PoS> props){
-        init(props);
+    public MorphProperties(Set<String> properties){
+        this.properties = properties;
     }
 
-    MorphProperties(String pattern){
+    MorphProperties(String properties){
 
-        this.properties = pattern;
+        String[] propsArray = properties.split("=");
+        String usefulProps = propsArray.length > 1 ? propsArray[1] : "";
 
-        /*
-        String[] props = pattern.split(",|=");
+        this.properties = new HashSet<>(Arrays.asList(usefulProps.split(",")));
+
+        //this.properties = new HashSet<>(Arrays.asList(properties.split(",")[0]));
+
+        /*String[] props = properties.split(",|=");
         Set<String>  tags = new HashSet<>(Arrays.asList(props));
-
+        // todo set of important tags
         Set<PoS> propsSet = PoS.get(tags);
 
         init(propsSet);
         */
 
 
+
     }
 
+    /*
     public MorphProperties(MorphProperties properties) {
         this.properties = properties.get();
     }
@@ -42,13 +47,14 @@ public class MorphProperties implements IMorphProperties{
 
         this.properties = builder.toString();
     }
+    */
 
     @Override
-    public String get() {
+    public Set<String> get() {
         return properties;
     }
 
-
+    /*
     enum PoS {
 
         S("Сущ"), A("Прил"), V("Глаг");
@@ -83,6 +89,8 @@ public class MorphProperties implements IMorphProperties{
         }
 
     }
+    */
+
 
     @Override
     public boolean equals(Object o) {
@@ -95,5 +103,10 @@ public class MorphProperties implements IMorphProperties{
     @Override
     public int hashCode() {
         return Objects.hash(properties);
+    }
+
+    @Override
+    public String toString() {
+        return Arrays.toString(properties.toArray());
     }
 }

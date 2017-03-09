@@ -16,8 +16,6 @@ import rule_applicability_reg.BayesRuleApplicabilityFactory;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.function.Function;
@@ -34,7 +32,7 @@ public class Main {
 
         tryAnalyze(analyzer, words);*/
 
-        comparatorExample();
+        binClassApr();
 
 
         //comparatorExample();
@@ -63,8 +61,16 @@ public class Main {
         Map<IMorphAnalyzer, QualityResult> res = assessment.start();
 
         for (Map.Entry<IMorphAnalyzer, QualityResult> entry : res.entrySet()) {
-            System.out.println(entry.getKey().getClass().getName() + ":");
-            System.out.println(entry.getValue().getInfo());
+            //System.out.println(entry.getKey().getClass().getName() + ":");
+            //System.out.println(entry.getValue().getInfo());
+            //Set<IWord> correct = entry.getValue().getDifficultWords();
+            //for (IWord word: correct){
+            //    System.out.println("Correct: " + word);
+            //    System.out.print("Predicted: " + entry.getKey().analyze(word.getWord()));
+            //    System.out.println();
+            //}
+            System.out.println(entry.getValue().getPrecision());
+
         }
 
     }
@@ -73,7 +79,7 @@ public class Main {
 
         IDatasetParser parser = new RusCorporaParser(new File("D:/dict/texts"));
 
-        IMorphAnalyzerFactory fact = new BayesRuleApplicabilityFactory(parser.getDataset());
+        IMorphAnalyzerFactory fact = new BayesRuleApplicabilityFactory(parser.getDataset(), new Random(0));
 
         File analyzer = new File("D:/dict/rules.nlzr");
 

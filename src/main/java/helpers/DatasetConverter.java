@@ -49,7 +49,7 @@ public class DatasetConverter {
         List<IMorpheme> added = new ArrayList<>();
         added.add(new Morpheme(lemma.substring(i)));
 
-        return new LemmaRule(removed, added, word.getProperties().get());
+        return new LemmaRule(removed, added, word.getProperties());
     }
 
     public static MorphemedWord extractMorphemes(IWord iWord){

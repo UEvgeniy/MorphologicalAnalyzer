@@ -9,7 +9,6 @@ public class Word implements IWord, Serializable {
 
     private static final long serialVersionUID = -2599795694043548965L;
     private final String word, lemma;
-    //private final IMorphProperties properties;
     private final IMorphProperties properties;
 
     public Word(String word, String lemma, IMorphProperties properties){
@@ -52,5 +51,12 @@ public class Word implements IWord, Serializable {
     @Override
     public int hashCode() {
         return Objects.hash(word, lemma, properties);
+    }
+
+    @Override
+    public String toString() {
+        return "Word: " + word +
+                ". Lemma: " + lemma +
+                ". Propreties: " + properties;
     }
 }
