@@ -62,8 +62,8 @@ public class QualityAssessment {
                     analyzer.analyze(entry.getKey()),
                     entry.getValue());
 
-            result_precision += forWord.getRecall();
-            result_recall += forWord.getPrecision();
+            result_precision += forWord.getPrecision();
+            result_recall += forWord.getRecall();
             difWords.addAll(forWord.getDifficultWords());
         }
 

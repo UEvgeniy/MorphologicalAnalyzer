@@ -3,6 +3,7 @@ package rule_applicability_reg;
 import datamodel.MorphemedWord;
 
 import java.util.Collection;
+import java.util.Map;
 
 /**
  * An interface for making decision about the applicability of the rule for the word
@@ -21,7 +22,7 @@ interface IClassifier {
      * @param features Features of the object
      * @param category Class of the object
      */
-    void train(Collection<String> features, Boolean category);
+    void train(Map<String,Boolean> dataset);
 
     /**
      * Set bound between good and bad probability

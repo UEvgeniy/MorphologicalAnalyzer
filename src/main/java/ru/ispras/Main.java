@@ -1,11 +1,9 @@
 package ru.ispras;
 
 import analyzers.IMorphAnalyzer;
-import aot_based.AotBasedAnalyzer;
-import aot_based.AotBasedFactory;
-import comparator.QualityAssessment;
 import comparator.EvaluationCriteria;
 import comparator.IEvaluationCriteria;
+import comparator.QualityAssessment;
 import comparator.QualityResult;
 import datamodel.IDataset;
 import datamodel.IWord;
@@ -20,9 +18,14 @@ import java.nio.file.Path;
 import java.util.*;
 import java.util.function.Function;
 
+
+
+
 public class Main {
 
     public static void main(String[] args) {
+
+
 
         /*IDataset dataset = new RusCorporaParser(new File("D:/dict")).getDataset();
 
@@ -32,10 +35,10 @@ public class Main {
 
         tryAnalyze(analyzer, words);*/
 
-        binClassApr();
+        //binClassApr();
 
 
-        //comparatorExample();
+        comparatorExample();
     }
 
     private static void comparatorExample() {
@@ -48,8 +51,9 @@ public class Main {
         Collection<Function<IDataset, IMorphAnalyzer>> funcs =
                 new ArrayList<>();
 
-        funcs.add(iDataset -> new AotBasedFactory(iDataset).create());
-        //funcs.add(iDataset -> new BayesRuleApplicabilityFactory(iDataset).create());
+        //funcs.add(iDataset -> new AotBasedFactory(iDataset).create());
+        funcs.add(iDataset -> new BayesRuleApplicabilityFactory(
+                iDataset, new Random(0), 2, 2).create());
 
         QualityAssessment assessment = new QualityAssessment(
                 funcs,
@@ -61,15 +65,9 @@ public class Main {
         Map<IMorphAnalyzer, QualityResult> res = assessment.start();
 
         for (Map.Entry<IMorphAnalyzer, QualityResult> entry : res.entrySet()) {
-            //System.out.println(entry.getKey().getClass().getName() + ":");
-            //System.out.println(entry.getValue().getInfo());
-            //Set<IWord> correct = entry.getValue().getDifficultWords();
-            //for (IWord word: correct){
-            //    System.out.println("Correct: " + word);
-            //    System.out.print("Predicted: " + entry.getKey().analyze(word.getWord()));
-            //    System.out.println();
-            //}
-            System.out.println(entry.getValue().getPrecision());
+            System.out.println(entry.getKey().getClass().getName() + ":");
+            System.out.println(entry.getValue().getInfo());
+
 
         }
 
@@ -79,7 +77,8 @@ public class Main {
 
         IDatasetParser parser = new RusCorporaParser(new File("D:/dict/texts"));
 
-        IMorphAnalyzerFactory fact = new BayesRuleApplicabilityFactory(parser.getDataset(), new Random(0));
+        IMorphAnalyzerFactory fact = new BayesRuleApplicabilityFactory(
+                parser.getDataset(), new Random(0), 2, 1);
 
         File analyzer = new File("D:/dict/rules.nlzr");
 

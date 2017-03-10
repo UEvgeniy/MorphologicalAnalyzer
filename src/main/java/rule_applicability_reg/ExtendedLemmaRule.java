@@ -4,9 +4,7 @@ import datamodel.*;
 import helpers.DatasetConverter;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * Extended class that use classifier classifier to define applicability
@@ -66,17 +64,26 @@ class ExtendedLemmaRule implements ILemmaRule, Serializable {
      * @param mWord word with extracted morphemes
      * @param property morphological properies for the word
      */
-    void train(MorphemedWord mWord, IMorphProperties property){
+    void train(Set<IWord> dataset){
 
-        // If the basic applicability rule doesn't fit the word,
-        //      then classifier classifier would not trained.
-        if (!mWord.getEnding().equals(removed)) {
-            throw new IllegalArgumentException
-                    ("Inappropriate word for train:" + mWord.getWord());
+        Map<String, Boolean> res = new HashMap<>();
+
+        for (IWord word : dataset) {
+
+            // If the basic applicability rule doesn't fit the word,
+            //      then classifier classifier would not trained.
+            if (!word.getWord().endsWith(removed)) {
+                throw new IllegalArgumentException
+                        ("Inappropriate word for train:" + word.getWord());
+            }
+
+            res.put(
+                    DatasetConverter.extractMorphemes(word).getRoot(),
+                    word.getProperties().equals(properties)
+            );
         }
 
-        classifier.train(NGrams.get(mWord.getRoot(), 2),
-                property.equals(this.properties));
+        classifier.train(res);
     }
 
     /**
@@ -84,9 +91,10 @@ class ExtendedLemmaRule implements ILemmaRule, Serializable {
      * @param bound double probability from 0 to 1
      */
     public void setLowerBound(double bound){
-        if (bound > 1 || bound < 0){
-            throw new IllegalArgumentException("Probability cannot be out of [0;1]");
-        }
+        // todo return
+        //if (bound > 1 || bound < 0){
+        //    throw new IllegalArgumentException("Probability cannot be out of [0;1]");
+        //}
         classifier.setLowerBound(bound);
     }
 
