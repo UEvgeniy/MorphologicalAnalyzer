@@ -2,9 +2,11 @@ package datamodel;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * Rule containing Pos + properties and the process of word transformation to lemma
@@ -26,9 +28,22 @@ public class LemmaRule implements ILemmaRule, Serializable{
         this.added = added;
         this.properties = properties;
     }
+    
+    public LemmaRule(String removed,
+            String added,
+            IMorphProperties properties){
+    	this(Arrays.asList(new Morpheme(removed)), Arrays.asList(new Morpheme(added)), properties);
+    }
 
+    public String getRemoved() {
+		return removed.stream().map(IMorpheme::getText).collect(Collectors.joining());
+	}
 
-    @Override
+	public void setRemoved(Collection<IMorpheme> removed) {
+		this.removed = removed;
+	}
+
+	@Override
     public Boolean isApplicable(MorphemedWord word) {
 
 

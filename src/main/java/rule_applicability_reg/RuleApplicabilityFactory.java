@@ -5,6 +5,7 @@ import analyzers.IMorphAnalyzer;
 import datamodel.DataSet;
 import datamodel.IDataset;
 import datamodel.IWord;
+import datamodel.LemmaRule;
 import datamodel.MorphemedWord;
 import factories.IMorphAnalyzerFactory;
 import helpers.DatasetConverter;
@@ -12,34 +13,29 @@ import helpers.SuffixesHelper;
 
 import java.sql.Array;
 import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * My own developed approach. The main idea -
  * collecting rules of transformation from word to its lemma
  * and training binary naive bayes classifier.
  */
-public class BayesRuleApplicabilityFactory implements IMorphAnalyzerFactory {
+public class RuleApplicabilityFactory implements IMorphAnalyzerFactory {
 
     // Data set of words for training analyzer
     private final IDataset words;
-    private final Random random;
-    private final int ngrams;
-    private final int difference;
-
-    private Map<String, Set<ExtendedLemmaRule>> rules;
-    private Map<String, Set<IWord>> wordSets;
-
+    private final IClassifierTrainer classifierTrainer;
+    
     /**
      * Constructor
      *
      * @param dictionary Data set of words for training analyzer
      */
-    public BayesRuleApplicabilityFactory(IDataset dictionary, Random random, int ngrams, int difference) {
+    public RuleApplicabilityFactory(IDataset dictionary, IClassifierTrainer classifierTrainer) {
         this.words = Objects.requireNonNull(dictionary,
                 "Data set cannot be null.");
-        this.random = Objects.requireNonNull(random);
-        this.difference = difference;
-        this.ngrams = ngrams;
+        this.classifierTrainer = classifierTrainer;
     }
 
     @Override
@@ -48,15 +44,53 @@ public class BayesRuleApplicabilityFactory implements IMorphAnalyzerFactory {
         // Collect all ending morphemes
         MorphemeExtractor me = new MorphemeExtractor(DatasetConverter.collectMorphemes(words.get()));
 
-        // Form the fastest structure for searching rules and words
-        collectRulesAndGroupWords();
-
-        // Train bayes classifier for each rule
-        trainRules();
-
-        return new BayesRulesApplicabilityAnalyzer(me, rules);
+        Set<LemmaRule> rules = generateRule(words.get());
+        Map<IWord, MorphemedWord> morphemed = morphemeWords(words.get());
+        
+        Map<String, Set<ExtendedLemmaRule>> extLemmaRules = new HashMap<>();
+        
+        for(LemmaRule rule : rules){
+        	Map<MorphemedWord, Boolean> trainingDataset = new HashMap<>();
+        	
+        	for(Map.Entry<IWord, MorphemedWord> entry: morphemed.entrySet()){
+        		if(!rule.isApplicable(entry.getValue())){
+        			continue;
+        		}
+        		trainingDataset.put(entry.getValue(), fullyApplicable(rule, entry.getKey(), entry.getValue()));
+        	}
+        	trainingDataset = normalize(trainingDataset);
+        	
+        	ExtendedLemmaRule extLemmaRule = new ExtendedLemmaRule(rule, classifierTrainer.apply(trainingDataset));
+        	
+        	extLemmaRules.computeIfAbsent(rule.getRemoved(), key -> new HashSet<>()).add(extLemmaRule);
+        }
+        return new BayesRulesApplicabilityAnalyzer(me, extLemmaRules);
+    }
+    
+    private Map<MorphemedWord, Boolean> normalize(Map<MorphemedWord, Boolean> dataset){
+    	//TODO
+    	return dataset;
+    }
+    
+    private boolean fullyApplicable(LemmaRule rule, IWord word, MorphemedWord morphemed){
+        return rule.isApplicable(morphemed) &&
+                rule.apply(morphemed).equals(word);
     }
 
+    private Map<IWord, MorphemedWord> morphemeWords(Set<IWord> words){
+    	return words.stream().collect(Collectors.toMap(Function.identity(), DatasetConverter::extractMorphemes));
+    }
+    
+    private Set<LemmaRule> generateRule(Set<IWord> words){
+    	Set<LemmaRule> result = new HashSet<>();
+    	for (IWord word : words) {
+    		 String removed = DatasetConverter.extractMorphemes(word).getEnding();
+    		 String added = word.getLemma().substring(SuffixesHelper.getCommonPrefixLength(word.getWord(), word.getLemma()));
+    		 result.add(new LemmaRule(removed, added, word.getProperties()));    		 
+    	}
+    	return result;
+    }
+    
     /**
      * Form the fastest structure for searching rules and words.
      */
@@ -74,6 +108,7 @@ public class BayesRuleApplicabilityFactory implements IMorphAnalyzerFactory {
             if (!wordSets.containsKey(end)) {
                 wordSets.put(end, new HashSet<>());
             }
+            //wordSets.computeIfAbsent(end, x -> new HashSet<>()).add(word);
             if (!rules.containsKey(end)) {
                 rules.put(end, new HashSet<>());
             }
@@ -95,7 +130,7 @@ public class BayesRuleApplicabilityFactory implements IMorphAnalyzerFactory {
                     end,
                     word.getLemma().substring(commonPrefixLen),
                     word.getProperties(),
-                    new BayesClassifierAdapter(ngrams));
+                    new BayesClassifierAdapter(ngramSize));
 
             rules.get(end).add(elr);
 

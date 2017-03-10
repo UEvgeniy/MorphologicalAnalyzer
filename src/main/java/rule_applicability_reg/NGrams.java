@@ -4,13 +4,31 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
+
+import datamodel.MorphemedWord;
+import net.sf.javaml.core.Instance;
+import net.sf.javaml.core.SparseInstance;
 
 /**
  * The only method forms the bigram for the word
  */
-class NGrams {
+public class NGrams implements Function<MorphemedWord, Instance>{
 
-    /**
+	private final int ngramSize;
+	
+    public NGrams(int ngramSize) {
+		this.ngramSize = ngramSize;
+	}
+
+	@Override
+	public Instance apply(MorphemedWord word) {
+		Instance instance = new SparseInstance();
+		instance.putAll(NGrams.get(word.getRoot(), ngramSize));
+		return instance;
+	}
+
+	/**
      * Method divides the word at list of pieces of N length
      * @param word The string broken into pieces
      * @param N The length of pieces

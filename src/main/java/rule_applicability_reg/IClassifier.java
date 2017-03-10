@@ -1,9 +1,8 @@
 package rule_applicability_reg;
 
-import datamodel.MorphemedWord;
-
-import java.util.Collection;
 import java.util.Map;
+
+import datamodel.MorphemedWord;
 
 /**
  * An interface for making decision about the applicability of the rule for the word

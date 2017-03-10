@@ -12,50 +12,40 @@ import java.util.*;
 class ExtendedLemmaRule implements ILemmaRule, Serializable {
 
     private static final long serialVersionUID = -1952315395633816558L;
-    private final String removed;
-    private final String added;
-    private final IMorphProperties properties;
-    private final IClassifier classifier;
+    private final LemmaRule rule;
+    private final IClassifierGood classifier;
 
     ExtendedLemmaRule(String remove, String add, IMorphProperties properties,
-                      IClassifier classifier) {
-        this.removed = Objects.requireNonNull(remove);
-        this.added = Objects.requireNonNull(add);
-        this.properties = Objects.requireNonNull(properties);
+                      IClassifierGood classifier) {
+        this.rule = new LemmaRule(Arrays.asList(new Morpheme(remove)), Arrays.asList(new Morpheme(add)), properties);
         this.classifier = Objects.requireNonNull(classifier);
     }
+    
+    public ExtendedLemmaRule(LemmaRule rule, IClassifierGood classifier) {
+		this.rule = rule;
+		this.classifier = classifier;
+	}
 
-    @Override
+	@Override
     public Boolean isApplicable(MorphemedWord word) {
-        return canApply(word) &&
-                classifier.isApplicable(word);
+        return rule.isApplicable(word) &&
+                classifier.predict(word);
     }
 
     @Override
     public IWord apply(MorphemedWord word) {
-        return new Word(
-                word.getWord(),
-                formLemma(word).getWord(),
-                getMorphProperties());
+       return rule.apply(word);
     }
 
     @Override
     public MorphemedWord formLemma(MorphemedWord word) {
-        if (word.getMorphemes().size() != 2){
-            throw new IllegalArgumentException("Incorrect number of morphemes");
-        }
-        List<IMorpheme> morphemes = new ArrayList<>();
-
-        morphemes.add(new Morpheme(word.getRoot()));
-        morphemes.add(new Morpheme(added));
-
-        return new MorphemedWord(morphemes);
+        return rule.formLemma(word);
     }
 
 
     @Override
     public IMorphProperties getMorphProperties() {
-        return properties;
+        return rule.getMorphProperties();
     }
 
 
@@ -132,17 +122,35 @@ class ExtendedLemmaRule implements ILemmaRule, Serializable {
     }
 
     @Override
-    public int hashCode() {
-        return Objects.hash(removed, added, properties);
-    }
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((classifier == null) ? 0 : classifier.hashCode());
+		result = prime * result + ((rule == null) ? 0 : rule.hashCode());
+		return result;
+	}
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof ExtendedLemmaRule)) return false;
-        ExtendedLemmaRule that = (ExtendedLemmaRule) o;
-        return Objects.equals(removed, that.removed) &&
-                Objects.equals(added, that.added) &&
-                Objects.equals(properties, that.properties);
-    }
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		ExtendedLemmaRule other = (ExtendedLemmaRule) obj;
+		if (classifier == null) {
+			if (other.classifier != null)
+				return false;
+		} else if (!classifier.equals(other.classifier))
+			return false;
+		if (rule == null) {
+			if (other.rule != null)
+				return false;
+		} else if (!rule.equals(other.rule))
+			return false;
+		return true;
+	}
+
+    
 }

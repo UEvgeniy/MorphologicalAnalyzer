@@ -10,7 +10,14 @@ import datamodel.IWord;
 import factories.*;
 import helpers.FileSearcher;
 import maslov_segalovich_based.MSFactory;
-import rule_applicability_reg.BayesRuleApplicabilityFactory;
+import net.sf.javaml.classification.Classifier;
+import net.sf.javaml.classification.bayes.NaiveBayesClassifier;
+import net.sf.javaml.core.Dataset;
+import rule_applicability_reg.JavaMlClassifierTrainer;
+import rule_applicability_reg.NGrams;
+import rule_applicability_reg.RuleApplicabilityFactory;
+import rule_applicability_reg.ThresholdClassifierTrainer;
+import rule_applicability_reg.naive_bayes.BayesClassifier;
 
 import java.io.File;
 import java.io.IOException;
@@ -52,8 +59,21 @@ public class Main {
                 new ArrayList<>();
 
         //funcs.add(iDataset -> new AotBasedFactory(iDataset).create());
-        funcs.add(iDataset -> new BayesRuleApplicabilityFactory(
-                iDataset, new Random(0), 2, 2).create());
+        
+        Function<Dataset, Classifier> classifierTrainer = 
+        		d -> {
+        			Classifier c = new NaiveBayesClassifier(false, false, true);
+        			c.buildClassifier(d);
+        			return c;
+        		};
+        
+        funcs.add(iDataset -> new RuleApplicabilityFactory(
+                iDataset,
+                new ThresholdClassifierTrainer(
+                		new JavaMlClassifierTrainer(new NGrams(2), classifierTrainer), 
+                		0.9, 
+                		new Random(0))
+                ).create());
 
         QualityAssessment assessment = new QualityAssessment(
                 funcs,
@@ -77,7 +97,7 @@ public class Main {
 
         IDatasetParser parser = new RusCorporaParser(new File("D:/dict/texts"));
 
-        IMorphAnalyzerFactory fact = new BayesRuleApplicabilityFactory(
+        IMorphAnalyzerFactory fact = new RuleApplicabilityFactory(
                 parser.getDataset(), new Random(0), 2, 1);
 
         File analyzer = new File("D:/dict/rules.nlzr");
