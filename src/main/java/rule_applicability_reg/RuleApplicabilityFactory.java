@@ -2,16 +2,10 @@ package rule_applicability_reg;
 
 import analyzers.IMorphAnalyzer;
 
-import datamodel.DataSet;
-import datamodel.IDataset;
-import datamodel.IWord;
-import datamodel.LemmaRule;
-import datamodel.MorphemedWord;
+import datamodel.*;
 import factories.IMorphAnalyzerFactory;
 import helpers.DatasetConverter;
-import helpers.SuffixesHelper;
 
-import java.sql.Array;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -26,7 +20,12 @@ public class RuleApplicabilityFactory implements IMorphAnalyzerFactory {
     // Data set of words for training analyzer
     private final IDataset words;
     private final IClassifierTrainer classifierTrainer;
-    
+
+    // How many times can a 'good' and 'bad' dataset differ in training binary classifier
+    private static final double difference = 2;
+    // The minimum number of words, for which LemmaRule must be fully applied
+    private static final int minWordForRule = 5;
+
     /**
      * Constructor
      *
@@ -42,58 +41,161 @@ public class RuleApplicabilityFactory implements IMorphAnalyzerFactory {
     public IMorphAnalyzer create() {
 
         // Collect all ending morphemes
-        MorphemeExtractor me = new MorphemeExtractor(DatasetConverter.collectMorphemes(words.get()));
+        MorphemeExtractor me = new MorphemeExtractor(
+                DatasetConverter.collectMorphemes(words.get()));
 
-        Set<LemmaRule> rules = generateRule(words.get());
-        Map<IWord, MorphemedWord> morphemed = morphemeWords(words.get());
-        
+        // Generate rules and filter unpopular rules(is determined by minWordForRule)
+        Set<LemmaRule> rules = generateRule(words.get(), minWordForRule);
+
+        // Extract MorphemedWord for each IWord
+        Map<IWord, MorphemedWord> morphemed = extractMorphemes(words.get());
+
+        // Mapping from ending to its possibly applicable rules
+        Map<String, Set<ExtendedLemmaRule>> extLemmaRules =
+                groupTrainRules(rules, morphemed);
+
+        return new RulesApplicabilityAnalyzer(me, extLemmaRules);
+    }
+
+    /**
+     * @param rules     Set of rules for which classifiers will be trained
+     * @param morphemed Map from IWord to its morphemes
+     * @return Map from removing part of word to its
+     */
+    private Map<String, Set<ExtendedLemmaRule>> groupTrainRules(
+            Set<LemmaRule> rules, Map<IWord, MorphemedWord> morphemed) {
+
         Map<String, Set<ExtendedLemmaRule>> extLemmaRules = new HashMap<>();
-        
-        for(LemmaRule rule : rules){
-        	Map<MorphemedWord, Boolean> trainingDataset = new HashMap<>();
-        	
-        	for(Map.Entry<IWord, MorphemedWord> entry: morphemed.entrySet()){
-        		if(!rule.isApplicable(entry.getValue())){
-        			continue;
-        		}
-        		trainingDataset.put(entry.getValue(), fullyApplicable(rule, entry.getKey(), entry.getValue()));
-        	}
-        	trainingDataset = normalize(trainingDataset);
-        	
-        	ExtendedLemmaRule extLemmaRule = new ExtendedLemmaRule(rule, classifierTrainer.apply(trainingDataset));
-        	
-        	extLemmaRules.computeIfAbsent(rule.getRemoved(), key -> new HashSet<>()).add(extLemmaRule);
+
+
+        int progress = 0;
+        for (LemmaRule rule : rules) {
+
+            showProgress(progress++, rules.size());
+
+            // Collection of Morhemed word which will be used in training binary classifier
+            Map<MorphemedWord, Boolean> trainingDataset = new HashMap<>();
+
+            for (Map.Entry<IWord, MorphemedWord> entry : morphemed.entrySet()) {
+                // If word cannot be possibly applied, skip it
+                if (!rule.isApplicable(entry.getValue())) {
+                    continue;
+                }
+
+                trainingDataset.put(entry.getValue(),
+                        fullyApplicable(rule, entry.getKey(), entry.getValue()));
+            }
+            trainingDataset = normalize(trainingDataset);
+
+            ExtendedLemmaRule extLemmaRule =
+                    new ExtendedLemmaRule(rule, classifierTrainer.apply(trainingDataset));
+
+            extLemmaRules.computeIfAbsent(
+                    rule.getRemoved(),
+                    key -> new HashSet<>()).add(extLemmaRule);
         }
-        return new BayesRulesApplicabilityAnalyzer(me, extLemmaRules);
+
+        return extLemmaRules;
     }
-    
-    private Map<MorphemedWord, Boolean> normalize(Map<MorphemedWord, Boolean> dataset){
-    	//TODO
-    	return dataset;
+
+    private void showProgress(int current, int full) {
+        if ((current * 100 / full) % 2 == 0)
+            System.out.println((double) (current) / full * 100);
     }
-    
-    private boolean fullyApplicable(LemmaRule rule, IWord word, MorphemedWord morphemed){
+
+    /**
+     * Method form rules from each IWord from set and get its Set
+     *
+     * @param words Set of IWords
+     * @return Set of filtered rules
+     */
+    private Set<LemmaRule> generateRule(Set<IWord> words, int min) {
+        Map<LemmaRule, Integer> countRules = new HashMap<>();
+
+        for (IWord word : words) {
+            // Form lemma rule for word
+            LemmaRule rule = DatasetConverter.getRuleFromWord(word);
+            // Count rules
+            countRules.merge(rule, 1, (a, b) -> ++a);
+        }
+
+        // Remove all rules for which number of words less than min and return set
+        return countRules.entrySet()
+                .stream()
+                .filter(map -> map.getValue() >= min)
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue))
+                .keySet();
+    }
+
+    /**
+     * Extract morpheme from each IWord
+     *
+     * @param words Set of IWords
+     * @return Mapping from word to its morphemed word
+     */
+    private Map<IWord, MorphemedWord> extractMorphemes(Set<IWord> words) {
+        return words.stream()
+                .collect(Collectors.toMap(
+                        Function.identity(),
+                        DatasetConverter::extractMorphemes));
+    }
+
+    /**
+     * Decrease a difference between positive and negative datasets
+     *
+     * @param dataset Non-normilized dataset
+     * @return Dataset with reduced difference between positive and negative datasets
+     */
+    private Map<MorphemedWord, Boolean> normalize(Map<MorphemedWord, Boolean> dataset) {
+
+        // Form lists of positive and negative dataset
+        List<MorphemedWord> good = dataset.entrySet().stream()
+                .filter(Map.Entry::getValue)
+                .map(Map.Entry::getKey)
+                .collect(Collectors.toList());
+
+        List<MorphemedWord> bad = dataset.entrySet().stream()
+                .filter(e -> !e.getValue())
+                .map(Map.Entry::getKey)
+                .collect(Collectors.toList());
+
+        // Normalize the difference between positive and negative datasets
+        if (good.size() > bad.size()) {
+            good = getSubList(good, (int) (bad.size() * difference));
+        } else {
+            bad = getSubList(bad, (int) (good.size() * difference));
+        }
+
+        // Add positive dataset
+        Map<MorphemedWord, Boolean> normalized = good.stream()
+                .collect(Collectors.toMap(Function.identity(), a -> true));
+
+        // Add negative dataset
+        normalized.putAll(
+                bad.stream()
+                        .collect(Collectors.toMap(Function.identity(), a -> false))
+        );
+
+        return normalized;
+    }
+
+    private static List<MorphemedWord> getSubList(List<MorphemedWord> list, int size) {
+        return list.subList(0, list.size() < size ? list.size() : size);
+    }
+
+    private boolean fullyApplicable(LemmaRule rule, IWord word, MorphemedWord morphemed) {
         return rule.isApplicable(morphemed) &&
                 rule.apply(morphemed).equals(word);
     }
 
-    private Map<IWord, MorphemedWord> morphemeWords(Set<IWord> words){
-    	return words.stream().collect(Collectors.toMap(Function.identity(), DatasetConverter::extractMorphemes));
-    }
+    // ===================== END OF CLASS ===================== //
+}
     
-    private Set<LemmaRule> generateRule(Set<IWord> words){
-    	Set<LemmaRule> result = new HashSet<>();
-    	for (IWord word : words) {
-    		 String removed = DatasetConverter.extractMorphemes(word).getEnding();
-    		 String added = word.getLemma().substring(SuffixesHelper.getCommonPrefixLength(word.getWord(), word.getLemma()));
-    		 result.add(new LemmaRule(removed, added, word.getProperties()));    		 
-    	}
-    	return result;
-    }
     
-    /**
+    /*
      * Form the fastest structure for searching rules and words.
      */
+    /*
     private void collectRulesAndGroupWords() {
 
         rules = new HashMap<>();
@@ -119,7 +221,7 @@ public class RuleApplicabilityFactory implements IMorphAnalyzerFactory {
             int commonPrefixLen = SuffixesHelper.
                     getCommonPrefixLength(word.getWord(), word.getLemma());
 
-            // todo condition may be removed
+
             //if (end.isEmpty() && commonPrefixLen < word.getLemma().length()){
             //    continue;
             //}
@@ -142,8 +244,10 @@ public class RuleApplicabilityFactory implements IMorphAnalyzerFactory {
      *
      * @param rules Sets of rules grouped by their removed ending
      */
+
+    /*
     private void trainRules() {
-        int a = 0; // todo remove loader
+        int a = 0;
         if (a++ % (rules.size() / 100) == 0)
             System.out.println(a * 100 / rules.size() + "%");
 
@@ -219,21 +323,22 @@ public class RuleApplicabilityFactory implements IMorphAnalyzerFactory {
                         DatasetConverter.extractMorphemes(biggerList.get(i)),
                         biggerList.get(i).getProperties());
 
-            }*/
+            }
             return;
         }
-
+/*
         Set<IWord> forTrainSet = good.size() == minSize ? good.get() : bad.get();
 
         // Train bigger set with less than difference * minimumSetSize elements
-        for (int i = 0; i < minSize * difference && i < biggerList.size(); i++) {
+/*        for (int i = 0; i < minSize * difference && i < biggerList.size(); i++) {
             forTrainSet.add(biggerList.get(i));
         }
 
         rule.train(forTrainSet);
 
     }
-
+*/
+    /*
     private double findBound(ExtendedLemmaRule rule, IDataset good, IDataset bad) {
 
         List<Double> goodProbs = new ArrayList<>();
@@ -261,4 +366,6 @@ public class RuleApplicabilityFactory implements IMorphAnalyzerFactory {
 
         return (bad_mean + good_mean) / 2;
     }
+
 }
+*/

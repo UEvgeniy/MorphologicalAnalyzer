@@ -36,20 +36,23 @@ public class DatasetConverter {
         return resultMorphemes;
     }
 
-    public static ILemmaRule getRuleFromWord(IWord word){
-        String w = word.getWord();
-        String lemma = word.getLemma();
+    public static LemmaRule getRuleFromWord(IWord iWord){
 
-        short i = SuffixesHelper.getCommonPrefixLength(w, lemma);
+        Objects.requireNonNull(iWord);
+
+        String word = iWord.getWord();
+        String lemma = iWord.getLemma();
+
+        short commonPrefixLength = SuffixesHelper.getCommonPrefixLength(word, lemma);
 
         //Build LemmaRule object
         List<IMorpheme> removed = new ArrayList<>();
-        removed.add(new Morpheme(w.substring(i)));
+        removed.add(new Morpheme(word.substring(commonPrefixLength)));
 
         List<IMorpheme> added = new ArrayList<>();
-        added.add(new Morpheme(lemma.substring(i)));
+        added.add(new Morpheme(lemma.substring(commonPrefixLength)));
 
-        return new LemmaRule(removed, added, word.getProperties());
+        return new LemmaRule(removed, added, iWord.getProperties());
     }
 
     public static MorphemedWord extractMorphemes(IWord iWord){

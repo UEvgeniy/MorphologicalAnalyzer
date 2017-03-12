@@ -13,10 +13,7 @@ import maslov_segalovich_based.MSFactory;
 import net.sf.javaml.classification.Classifier;
 import net.sf.javaml.classification.bayes.NaiveBayesClassifier;
 import net.sf.javaml.core.Dataset;
-import rule_applicability_reg.JavaMlClassifierTrainer;
-import rule_applicability_reg.NGrams;
-import rule_applicability_reg.RuleApplicabilityFactory;
-import rule_applicability_reg.ThresholdClassifierTrainer;
+import rule_applicability_reg.*;
 import rule_applicability_reg.naive_bayes.BayesClassifier;
 
 import java.io.File;
@@ -31,6 +28,14 @@ import java.util.function.Function;
 public class Main {
 
     public static void main(String[] args) {
+
+        Map<String, Set<Integer>> map = new HashMap<>();
+
+        map.put("h", new HashSet<>());
+
+        Set<Integer> set = map.getOrDefault("", new HashSet<>());
+
+        int a = 12;
 
 
 
@@ -97,10 +102,23 @@ public class Main {
 
         IDatasetParser parser = new RusCorporaParser(new File("D:/dict/texts"));
 
-        IMorphAnalyzerFactory fact = new RuleApplicabilityFactory(
-                parser.getDataset(), new Random(0), 2, 1);
 
-        File analyzer = new File("D:/dict/rules.nlzr");
+        Function<Dataset, Classifier> classifierTrainer =
+                d -> {
+                    Classifier c = new NaiveBayesClassifier(false, false, true);
+                    c.buildClassifier(d);
+                    return c;
+                };
+
+        IMorphAnalyzerFactory fact = new RuleApplicabilityFactory(
+                parser.getDataset(),
+                new ThresholdClassifierTrainer(
+                        new JavaMlClassifierTrainer(new NGrams(2), classifierTrainer),
+                        0.9,
+                        new Random(0))
+        );
+
+        //File analyzer = new File("D:/dict/rules.nlzr");
 
         IMorphAnalyzer my = fact.create();
         /*try {
@@ -115,7 +133,7 @@ public class Main {
     }
 
     private static String[] words = {
-            "гоношилась", "подошел", "невпечатляющих", "коготочка",
+            "гоношилась", "подошёл", "невпечатляющих", "коготочка",
             "гаманка",      // based on "наркоманка" expected "гаманок"
             "шуфлядки",     // based on "оглядки"
             "млявого",      // based on "кудрявого"

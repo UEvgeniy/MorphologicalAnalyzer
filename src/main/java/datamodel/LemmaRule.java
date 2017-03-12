@@ -1,11 +1,7 @@
 package datamodel;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -29,10 +25,9 @@ public class LemmaRule implements ILemmaRule, Serializable{
         this.properties = properties;
     }
     
-    public LemmaRule(String removed,
-            String added,
-            IMorphProperties properties){
-    	this(Arrays.asList(new Morpheme(removed)), Arrays.asList(new Morpheme(added)), properties);
+    public LemmaRule(String removed, String added, IMorphProperties properties){
+    	this(Collections.singletonList(new Morpheme(removed)),
+                Collections.singletonList(new Morpheme(added)), properties);
     }
 
     public String getRemoved() {
@@ -45,8 +40,6 @@ public class LemmaRule implements ILemmaRule, Serializable{
 
 	@Override
     public Boolean isApplicable(MorphemedWord word) {
-
-
         Collection<IMorpheme> morphemesInWord = word.getMorphemes();
 
         for (IMorpheme morpheme : removed){

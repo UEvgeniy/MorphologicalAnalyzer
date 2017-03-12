@@ -54,6 +54,7 @@ class ExtendedLemmaRule implements ILemmaRule, Serializable {
      * @param mWord word with extracted morphemes
      * @param property morphological properies for the word
      */
+    /*
     void train(Set<IWord> dataset){
 
         Map<String, Boolean> res = new HashMap<>();
@@ -75,30 +76,33 @@ class ExtendedLemmaRule implements ILemmaRule, Serializable {
 
         classifier.train(res);
     }
-
+*/
     /**
      * Set lower bound of probability
      * @param bound double probability from 0 to 1
      */
+    /*
     public void setLowerBound(double bound){
         // todo return
         //if (bound > 1 || bound < 0){
         //    throw new IllegalArgumentException("Probability cannot be out of [0;1]");
         //}
         classifier.setLowerBound(bound);
-    }
+    }*/
 
     /**
      * Count the probability of applicability rule to the word
      * @param word word with extracted morphemes
      * @return double probability from 0 to 1
      */
+    /*
     double getProbability(MorphemedWord word){
         if (!word.getEnding().equals(removed)) {
             return 0;
         }
         return classifier.getProbability(word);
     }
+    */
 
 
     /**
@@ -106,20 +110,24 @@ class ExtendedLemmaRule implements ILemmaRule, Serializable {
      * @param word word with extracted morphemes
      * @return True, if word and rule has similar end. If not, False
      */
+    /*
     boolean canApply(MorphemedWord word){
         return word.getEnding().equals(removed);
     }
+    */
 
     /**
      * Can word be applied to currect rule
      * @param word word with extracted morphemes
      * @return True, if word and rule has similar end. If not, False
      */
+    /*
     boolean fullyApplicable(IWord word){
         MorphemedWord mWord = DatasetConverter.extractMorphemes(word);
         return canApply(mWord) &&
                 apply(mWord).equals(word);
     }
+    */
 
     @Override
 	public int hashCode() {
