@@ -11,8 +11,10 @@ import factories.*;
 import helpers.FileSearcher;
 import maslov_segalovich_based.MSFactory;
 import net.sf.javaml.classification.Classifier;
+import net.sf.javaml.classification.KNearestNeighbors;
 import net.sf.javaml.classification.bayes.NaiveBayesClassifier;
 import net.sf.javaml.core.Dataset;
+import net.sf.javaml.tools.weka.WekaClassifier;
 import rule_applicability_reg.*;
 import rule_applicability_reg.naive_bayes.BayesClassifier;
 
@@ -28,60 +30,62 @@ import java.util.function.Function;
 public class Main {
 
     public static void main(String[] args) {
-
-        Map<String, Set<Integer>> map = new HashMap<>();
-
-        map.put("h", new HashSet<>());
-
-        Set<Integer> set = map.getOrDefault("", new HashSet<>());
-
-        int a = 12;
-
-
-
-        /*IDataset dataset = new RusCorporaParser(new File("D:/dict")).getDataset();
-
-        AotBasedFactory fact = new AotBasedFactory(dataset);
-
-        IMorphAnalyzer analyzer = fact.create();
-
-        tryAnalyze(analyzer, words);*/
-
-        //binClassApr();
-
-
-        comparatorExample();
+        compareClassifiers();
     }
 
-    private static void comparatorExample() {
+    private static void compareClassifiers(){
+
+        Collection<Function<IDataset, IMorphAnalyzer>> fromDataSetToAnalyzers =
+                new ArrayList<>();
+
+        //IClassifierTrainer bayes = getThresholdTrainer(
+        //        new NaiveBayesClassifier(false, false, true));
+
+        IClassifierTrainer knear  = getThresholdTrainer(
+                new KNearestNeighbors(3)
+        );
+
+        fromDataSetToAnalyzers.add(
+                (d) -> new RuleApplicabilityFactory(d, knear).create());
+
+        //fromDataSetToAnalyzers.add(
+        //        (d) -> new RuleApplicabilityFactory(d, knear).create());
+
+        comparatorExample(fromDataSetToAnalyzers);
+    }
+
+    private static IClassifierTrainer getThresholdTrainer(Classifier classifier){
+
+        Function<Dataset, Classifier> classifierFunction = (d) ->
+        {
+            classifier.buildClassifier(d);
+            return classifier;
+        };
+
+        IClassifierTrainer wrapped = new JavaMlClassifierTrainer(
+                new NGrams(2),
+                classifierFunction
+        );
+
+        return new ThresholdClassifierTrainer(
+                wrapped,
+                0.8,
+                new Random(0));
+    }
+
+    private static void comparatorExample(
+            Collection<Function<IDataset, IMorphAnalyzer>> fromDataSetToAnalyzers) {
+
+
         IEvaluationCriteria criteria = new EvaluationCriteria();
 
         IDataset dataset = new RusCorporaParser(new File("D:/dict")).getDataset();
 
         List<IDataset> splitted = dataset.split(99, new Random(0));
 
-        Collection<Function<IDataset, IMorphAnalyzer>> funcs =
-                new ArrayList<>();
-
-        //funcs.add(iDataset -> new AotBasedFactory(iDataset).create());
-        
-        Function<Dataset, Classifier> classifierTrainer = 
-        		d -> {
-        			Classifier c = new NaiveBayesClassifier(false, false, true);
-        			c.buildClassifier(d);
-        			return c;
-        		};
-        
-        funcs.add(iDataset -> new RuleApplicabilityFactory(
-                iDataset,
-                new ThresholdClassifierTrainer(
-                		new JavaMlClassifierTrainer(new NGrams(2), classifierTrainer), 
-                		0.9, 
-                		new Random(0))
-                ).create());
-
+        // Create and launch
         QualityAssessment assessment = new QualityAssessment(
-                funcs,
+                fromDataSetToAnalyzers,
                 splitted.get(0),
                 splitted.get(1),
                 criteria);
@@ -92,45 +96,10 @@ public class Main {
         for (Map.Entry<IMorphAnalyzer, QualityResult> entry : res.entrySet()) {
             System.out.println(entry.getKey().getClass().getName() + ":");
             System.out.println(entry.getValue().getInfo());
-
-
         }
 
     }
 
-    private static void binClassApr() {
-
-        IDatasetParser parser = new RusCorporaParser(new File("D:/dict/texts"));
-
-
-        Function<Dataset, Classifier> classifierTrainer =
-                d -> {
-                    Classifier c = new NaiveBayesClassifier(false, false, true);
-                    c.buildClassifier(d);
-                    return c;
-                };
-
-        IMorphAnalyzerFactory fact = new RuleApplicabilityFactory(
-                parser.getDataset(),
-                new ThresholdClassifierTrainer(
-                        new JavaMlClassifierTrainer(new NGrams(2), classifierTrainer),
-                        0.9,
-                        new Random(0))
-        );
-
-        //File analyzer = new File("D:/dict/rules.nlzr");
-
-        IMorphAnalyzer my = fact.create();
-        /*try {
-            //my = new MorphAnalyzerSaver(fact, analyzer.toPath()).create();
-
-        } catch (IOException e) {
-            System.out.println(e.getMessage());
-            return;
-        }
-*/
-        tryAnalyze(my, words);
-    }
 
     private static String[] words = {
             "гоношилась", "подошёл", "невпечатляющих", "коготочка",

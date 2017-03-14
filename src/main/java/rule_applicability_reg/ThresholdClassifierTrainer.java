@@ -3,7 +3,6 @@ package rule_applicability_reg;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -15,11 +14,15 @@ import datamodel.MorphemedWord;
 
 public class ThresholdClassifierTrainer implements IClassifierTrainer{
 
+	/**
+	 *
+	 */
 	private static class SplittedDataset {
 		private final Map<MorphemedWord, Boolean> train;
 		private final Map<MorphemedWord, Boolean> development;
 		
-		public SplittedDataset(Map<MorphemedWord, Boolean> train, Map<MorphemedWord, Boolean> development) {
+		SplittedDataset(Map<MorphemedWord, Boolean> train,
+						Map<MorphemedWord, Boolean> development) {
 			this.train = train;
 			this.development = development;
 		}
@@ -36,12 +39,14 @@ public class ThresholdClassifierTrainer implements IClassifierTrainer{
 	}
 
 	@Override
-	public IClassifierGood apply(Map<MorphemedWord, Boolean> dataset) {
+	public IClassifier apply(Map<MorphemedWord, Boolean> dataset) {
 		SplittedDataset splitted = split(dataset);
-		IClassifierGood classifier = wrapped.apply(splitted.train);
+		IClassifier classifier = wrapped.apply(splitted.train);
 		Map<Boolean, List<Double>> distribution = 
 				splitted.development.entrySet().stream()
-					.map(entry -> new AbstractMap.SimpleEntry<>(entry.getValue(), classifier.getProbability(entry.getKey())))
+					.map(entry -> new AbstractMap.SimpleEntry<>(
+							entry.getValue(),
+							classifier.getProbability(entry.getKey())))
 					.collect(
 							Collectors.groupingBy(
 									Map.Entry::getKey, 
@@ -59,34 +64,49 @@ public class ThresholdClassifierTrainer implements IClassifierTrainer{
 						.orElse(1.0))
 				.average()
 				.orElse(1.0);
-				
 	}
 	
 	private SplittedDataset split(Map<MorphemedWord, Boolean> dataset){
 		List<MorphemedWord> positive = getShuffled(dataset, true);
-		List<MorphemedWord> negative = getShuffled(dataset, true);
+		List<MorphemedWord> negative = getShuffled(dataset, false);
 		
 		int bound = (int) (positive.size() * proportion);
-		List<MorphemedWord> positiveTrain = new ArrayList<>(positive.subList(0, bound));
-		List<MorphemedWord> positiveTest = new ArrayList<>(positive.subList(bound, positive.size()));
+		List<MorphemedWord> positiveTrain =
+				new ArrayList<>(positive.subList(0, bound));
+		List<MorphemedWord> positiveTest =
+				new ArrayList<>(positive.subList(bound, positive.size()));
 		
 		bound = (int) (negative.size() * proportion);
-		List<MorphemedWord> negativeTrain = new ArrayList<>(negative.subList(0, bound));
-		List<MorphemedWord> negativeTest = new ArrayList<>(negative.subList(bound, negative.size()));
+		List<MorphemedWord> negativeTrain =
+				new ArrayList<>(negative.subList(0, bound));
+		List<MorphemedWord> negativeTest =
+				new ArrayList<>(negative.subList(bound, negative.size()));
 		
-		return new SplittedDataset(getSubDataset(dataset, merge(positiveTrain, negativeTrain)), getSubDataset(dataset, merge(positiveTest, negativeTest)));
+		return new SplittedDataset(
+				getSubDataset(dataset, merge(positiveTrain, negativeTrain)),
+				getSubDataset(dataset, merge(positiveTest, negativeTest)));
 	}
 
-	private Set<MorphemedWord> merge(List<MorphemedWord> positiveTrain, List<MorphemedWord> negativeTrain) {
-		return Stream.of(positiveTrain, negativeTrain).flatMap(List::stream).collect(Collectors.toSet());
+	private Set<MorphemedWord> merge(List<MorphemedWord> positiveTrain,
+									 List<MorphemedWord> negativeTrain) {
+		return Stream.of(positiveTrain, negativeTrain)
+				.flatMap(List::stream)
+				.collect(Collectors.toSet());
 	}
 
-	private Map<MorphemedWord, Boolean> getSubDataset(Map<MorphemedWord, Boolean> dataset, Set<MorphemedWord> words){
-		return dataset.entrySet().stream().filter(entry -> words.contains(entry.getKey())).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+	private Map<MorphemedWord, Boolean> getSubDataset(Map<MorphemedWord, Boolean> dataset,
+													  Set<MorphemedWord> words){
+		return dataset.entrySet().stream()
+				.filter(entry -> words.contains(entry.getKey()))
+				.collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 	}
 	
-	private List<MorphemedWord> getShuffled(Map<MorphemedWord, Boolean> dataset, Boolean classLabel) {
-		List<MorphemedWord> words = dataset.entrySet().stream().filter(entry -> entry.getValue().equals(classLabel)).map(Map.Entry::getKey).collect(Collectors.toList());
+	private List<MorphemedWord> getShuffled(Map<MorphemedWord, Boolean> dataset,
+											Boolean classLabel) {
+		List<MorphemedWord> words = dataset.entrySet().stream()
+				.filter(entry -> entry.getValue().equals(classLabel))
+				.map(Map.Entry::getKey)
+				.collect(Collectors.toList());
 		Collections.shuffle(words, random);
 		return words;
 	}

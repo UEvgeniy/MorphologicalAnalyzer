@@ -16,6 +16,11 @@ import net.sf.javaml.core.SparseInstance;
 public class NGrams implements Function<MorphemedWord, Instance>{
 
 	private final int ngramSize;
+	private static Map<String, Integer> collectionSubstrings;
+
+	static {
+	    collectionSubstrings = new HashMap<>();
+    }
 	
     public NGrams(int ngramSize) {
 		this.ngramSize = ngramSize;
@@ -27,6 +32,7 @@ public class NGrams implements Function<MorphemedWord, Instance>{
 		instance.putAll(NGrams.get(word.getRoot(), ngramSize));
 		return instance;
 	}
+
 
 	/**
      * Method divides the word at list of pieces of N length
@@ -40,7 +46,10 @@ public class NGrams implements Function<MorphemedWord, Instance>{
             throw new IllegalArgumentException("N value must be positive.");
         }
 
-        List<String> ngrams = new ArrayList<>();
+        word = new String(new char[N - 1])
+                .concat(word)
+                .concat(new String(new char[N - 1]));
+
 
         Map<Integer, Double> result = new HashMap<>();
 
@@ -53,12 +62,7 @@ public class NGrams implements Function<MorphemedWord, Instance>{
 
             int order = getOrder(word.substring(i, i + N));
 
-            if (result.containsKey(order)){
-                result.put(order, result.get(order) + 1);
-            }
-            else{
-                result.put(order, 1.0);
-            }
+            result.merge(order, 1.0, (a, b) -> a+b);
         }
 
         return result;
@@ -66,12 +70,9 @@ public class NGrams implements Function<MorphemedWord, Instance>{
 
     private static int getOrder(String str){
 
-        int res = 0;
-
-        for (int i = 0; i < str.length(); i++){
-            res += (str.charAt(i) - 'а') * Math.pow(33, str.length() - 1 - i);
-        }
-
-        return Math.abs(res);
+        return collectionSubstrings.computeIfAbsent(
+                str,
+                (a) -> collectionSubstrings.size()
+        );
     }
 }

@@ -2,12 +2,12 @@ package rule_applicability_reg;
 
 import datamodel.MorphemedWord;
 
-public class ThresholdClassifier implements IClassifierGood{
+public class ThresholdClassifier implements IClassifier {
 
-	private final IClassifierGood classifier;
+	private final IClassifier classifier;
 	private final double threshold;
 	
-	public ThresholdClassifier(IClassifierGood classifier, double threshold) {
+	ThresholdClassifier(IClassifier classifier, double threshold) {
 		this.classifier = classifier;
 		this.threshold = threshold;
 	}
