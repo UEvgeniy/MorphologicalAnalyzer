@@ -1,5 +1,7 @@
 package datamodel;
 
+import datamodel.properties.IMorphProperties;
+
 /**
  * Interface for rules of converting word to their initial forms (lemmas)
  */

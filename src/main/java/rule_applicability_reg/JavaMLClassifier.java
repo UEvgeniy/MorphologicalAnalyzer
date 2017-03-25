@@ -1,5 +1,6 @@
 package rule_applicability_reg;
 
+import java.io.Serializable;
 import java.util.Map;
 import java.util.function.Function;
 
@@ -7,8 +8,9 @@ import datamodel.MorphemedWord;
 import net.sf.javaml.classification.Classifier;
 import net.sf.javaml.core.Instance;
 
-public class JavaMLClassifier implements IClassifier {
+public class JavaMLClassifier implements IClassifier, Serializable {
 
+	private static final long serialVersionUID = -4849568672079240168L;
 	private final Classifier classifier;
 	private final Function<MorphemedWord, Instance> instanceFactory;
 

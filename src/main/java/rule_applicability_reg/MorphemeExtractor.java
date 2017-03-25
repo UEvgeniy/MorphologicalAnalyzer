@@ -32,11 +32,11 @@ class MorphemeExtractor implements Serializable {
         ArrayList<MorphemedWord> result = new ArrayList<>();
 
         for (IMorpheme m : morphemes ){
-            if (word.endsWith(m.getText())){
+            if (word.endsWith(m.get())){
 
                 IMorpheme root =
                         new Morpheme(word.substring(0,
-                                word.length() - m.getText().length()));
+                                word.length() - m.get().length()));
 
                 List<IMorpheme> morphemes = new ArrayList<>();
                 morphemes.add(root);

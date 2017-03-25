@@ -16,11 +16,11 @@ public class MorphemedWord {
     /**
      * @return String representation of the word
      */
-    public String getWord(){
+    public String get(){
         String word = "";
 
         for (IMorpheme m : morphemes){
-            word = word.concat(m.getText());
+            word = word.concat(m.get());
         }
 
         return word;
@@ -30,16 +30,18 @@ public class MorphemedWord {
      * @return The last morpheme in the word
      */
     public String getEnding(){
-        return morphemes.get(morphemes.size() - 1).getText();
+        return morphemes.get(morphemes.size() - 1).get();
     }
 
     public String getRoot() {
-        return morphemes.get(0).getText();
+        return morphemes.get(0).get();
     }
+
+
     /**
      * @return Collection of morphemes that make up the word
      */
-    public List<IMorpheme> getMorphemes(){
+    List<IMorpheme> getMorphemes(){
         return morphemes;
     }
 }

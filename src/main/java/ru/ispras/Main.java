@@ -8,29 +8,26 @@ import comparator.QualityResult;
 import datamodel.IDataset;
 import datamodel.IWord;
 import factories.*;
-import helpers.FileSearcher;
-import maslov_segalovich_based.MSFactory;
-import net.sf.javaml.classification.Classifier;
-import net.sf.javaml.classification.KNearestNeighbors;
-import net.sf.javaml.classification.bayes.NaiveBayesClassifier;
-import net.sf.javaml.core.Dataset;
-import net.sf.javaml.tools.weka.WekaClassifier;
+import libsvm.LibSVM;
+import parsers.DatasetParser;
+import parsers.Parsers;
 import rule_applicability_reg.*;
-import rule_applicability_reg.naive_bayes.BayesClassifier;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Path;
 import java.util.*;
 import java.util.function.Function;
-
-
 
 
 public class Main {
 
     public static void main(String[] args) {
-        compareClassifiers();
+
+        IDataset dataset = Examples.extractFilterDataset("D://dict/syntagrus");
+
+
+
+
     }
 
     private static void compareClassifiers(){
@@ -41,37 +38,25 @@ public class Main {
         //IClassifierTrainer bayes = getThresholdTrainer(
         //        new NaiveBayesClassifier(false, false, true));
 
-        IClassifierTrainer knear  = getThresholdTrainer(
-                new KNearestNeighbors(3)
-        );
+        IClassifierTrainer svm  = Examples.getThresholdTrainer(new LibSVM());
 
         fromDataSetToAnalyzers.add(
-                (d) -> new RuleApplicabilityFactory(d, knear).create());
 
-        //fromDataSetToAnalyzers.add(
-        //        (d) -> new RuleApplicabilityFactory(d, knear).create());
+                (d) -> {
+                    //IMorphAnalyzerFactory ruleFact = new RuleApplicabilityFactory(d, svm);
+                    try {
+                        return new MorphAnalyzerLoader(new File("D://dict/svm")).create();
+                        //return new MorphAnalyzerSaver(ruleFact, new File("D:/dict/svm")).create();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    return null;
+                });
 
         comparatorExample(fromDataSetToAnalyzers);
     }
 
-    private static IClassifierTrainer getThresholdTrainer(Classifier classifier){
 
-        Function<Dataset, Classifier> classifierFunction = (d) ->
-        {
-            classifier.buildClassifier(d);
-            return classifier;
-        };
-
-        IClassifierTrainer wrapped = new JavaMlClassifierTrainer(
-                new NGrams(2),
-                classifierFunction
-        );
-
-        return new ThresholdClassifierTrainer(
-                wrapped,
-                0.8,
-                new Random(0));
-    }
 
     private static void comparatorExample(
             Collection<Function<IDataset, IMorphAnalyzer>> fromDataSetToAnalyzers) {
@@ -79,7 +64,9 @@ public class Main {
 
         IEvaluationCriteria criteria = new EvaluationCriteria();
 
-        IDataset dataset = new RusCorporaParser(new File("D:/dict")).getDataset();
+        IDataset dataset = new DatasetParser(
+                Parsers::RusCorpora,
+                new File("D://dict")).getDataset();
 
         List<IDataset> splitted = dataset.split(99, new Random(0));
 
@@ -110,13 +97,13 @@ public class Main {
             "студака"       // based on "чудака"
     };
 
-
+    /*
     private static void testSegalovich() {
-        Path saveTo = new File("D://dict/aot.nlzr").toPath();
+        File saveTo = new File("D://dict/aot.nlzr");
 
-        List<File> dict = FileSearcher.getFileList(new File("D://dict"), ".xhtml");
+        List<File> dict = FileSearcher.getFileList(new File("D://dict"));
 
-        IDatasetParser parser = new RusCorporaParser(null);
+
 
         IMorphAnalyzerFactory segFact = new MSFactory(parser.getDataset());
 
@@ -133,50 +120,7 @@ public class Main {
             System.out.print(e.getMessage());
         }
     }
-
-    private static void testAllAnalyzers() {
-        // A .xhtml file or folder containing .xhtml files (RusCorpora)
-        final File dict = new File("D://dict");
-
-        // File for saving dictionary
-        final File saveTo = new File("D://analyzer.nlzr");
-
-        // Can analyze only words with an even word length and define lemma and properties as 42
-        //IMorphAnalyzerFactory fact42 = veryPlainAnalyzer();
-
-        IDatasetParser parser = new RusCorporaParser(null);
-
-
-        try {
-
-            // Parse dictionary and save it
-            IDataset dataset = new RusCorporaParser(dict).getDataset();
-            IMorphAnalyzerFactory dictFactory = new DictionaryFactory(dataset);
-            IMorphAnalyzerFactory saver = new MorphAnalyzerSaver(dictFactory, saveTo.toPath());
-            saver.create();
-
-            // Load saved analyzer
-            MorphAnalyzerLoader loader = new MorphAnalyzerLoader(saveTo.toPath());
-
-            // Order of arguments in constructor is IMPORTANT!
-            // Swap arguments and analyzer behavior may be changed.
-            CompositeMorphAnalyzerFactory comp = new CompositeMorphAnalyzerFactory(loader);
-
-            IMorphAnalyzer analyzer = comp.create();
-
-            // Recommended to add words with odd/even length and also words from parsed dictionary
-            tryAnalyze(analyzer, "и");         // dictionary analyzer
-            tryAnalyze(analyzer, "колобки");   // MorphemeBasedAnalyzer
-            tryAnalyze(analyzer, "лестницы");     // MorphemeBasedAnalyzer
-            tryAnalyze(analyzer, "скрывающееся");// MorphemeBasedAnalyzer
-            tryAnalyze(analyzer, "менять");    //
-            tryAnalyze(analyzer, "стимулом");  // dictionary analyzer
-            tryAnalyze(analyzer, "что");       // dictionary analyzer
-
-        } catch (IOException e) {
-            System.out.print(e.getMessage());
-        }
-    }
+    */
 
     private static void tryAnalyze(IMorphAnalyzer an, String... words) {
 
@@ -185,7 +129,7 @@ public class Main {
                 Collection<IWord> answers = an.analyze(word);
                 System.out.println("WORD: " + word);
                 for (IWord w : answers) {
-                    System.out.println("\tLEMMA: " + w.getLemma() + "\tPROPS: " + w.getProperties().get());
+                    System.out.println("\tLEMMA: " + w.getLemma() + "\tPROPS: " + w.getProperties().toString());
                 }
             } else {
                 System.out.println("Word " + word + "\n\tcannot be analyzed");

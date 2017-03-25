@@ -15,12 +15,12 @@ public class MorphAnalyzerSaver implements IMorphAnalyzerFactory, Closeable {
     private final ObjectOutputStream oos;
 
 
-    public MorphAnalyzerSaver(IMorphAnalyzerFactory factory, Path path) throws IOException{
+    public MorphAnalyzerSaver(IMorphAnalyzerFactory factory, File file) throws IOException{
 
         this.factory = factory;
 
         this.oos = new ObjectOutputStream(
-                new FileOutputStream(path.toString())
+                new FileOutputStream(file.toPath().toString())
         );
     }
 

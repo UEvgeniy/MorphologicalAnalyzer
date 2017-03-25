@@ -17,7 +17,7 @@ class Lexeme implements Comparable<Lexeme>, Serializable{
     private int repeats;
 
     public Lexeme(String basis){
-        this(basis, new Word(basis, basis, ""), 0);
+        //this(basis, new Word(basis, basis, ""), 0);
     }
 
     public Lexeme(String basis, IWord lexeme, int repeats){

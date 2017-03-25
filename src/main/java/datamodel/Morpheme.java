@@ -1,6 +1,7 @@
 package datamodel;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 // todo add getType() method
 public class Morpheme implements IMorpheme, Serializable {
@@ -13,23 +14,20 @@ public class Morpheme implements IMorpheme, Serializable {
     }
 
     @Override
-    public String getText() {
+    public String get() {
         return morpheme;
     }
 
     @Override
     public int hashCode() {
-        return morpheme.hashCode();
+        return Objects.hashCode(morpheme);
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof Morpheme)) return false;
-
         Morpheme morpheme1 = (Morpheme) o;
-
-        return morpheme != null ? morpheme.equals(morpheme1.morpheme) : morpheme1.morpheme == null;
-
+        return Objects.equals(morpheme, morpheme1.morpheme);
     }
 }

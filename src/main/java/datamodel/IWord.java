@@ -1,5 +1,7 @@
 package datamodel;
 
+import datamodel.properties.IMorphProperties;
+
 /**
  * An interface for classes containing the initial form of the word and its own PoS and properties
  */

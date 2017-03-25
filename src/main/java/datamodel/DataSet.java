@@ -1,6 +1,7 @@
 package datamodel;
 
 import java.util.*;
+import java.util.function.Predicate;
 
 /**
  * Class for storage tagged dictionary of IWords
@@ -56,6 +57,18 @@ public class DataSet implements  IDataset{
     @Override
     public List<IDataset> split(int percentage) {
         return split(percentage, new Random());
+    }
+
+    @Override
+    public IDataset filter(Predicate<IWord> predicate) {
+        Set<IWord> newDataset = new HashSet<>();
+
+        for (IWord word: this){
+            if (predicate.test(word)){
+                newDataset.add(word);
+            }
+        }
+        return new DataSet(newDataset);
     }
 
     @Override

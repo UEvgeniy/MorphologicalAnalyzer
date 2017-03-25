@@ -1,5 +1,6 @@
 package rule_applicability_reg;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -13,9 +14,10 @@ import net.sf.javaml.core.SparseInstance;
 /**
  * The only method forms the bigram for the word
  */
-public class NGrams implements Function<MorphemedWord, Instance>{
+public class NGrams implements Function<MorphemedWord, Instance>, Serializable{
 
-	private final int ngramSize;
+    private static final long serialVersionUID = -6814991698109038993L;
+    private final int ngramSize;
 	private static Map<String, Integer> collectionSubstrings;
 
 	static {

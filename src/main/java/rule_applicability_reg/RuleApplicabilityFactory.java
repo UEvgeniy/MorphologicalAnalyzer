@@ -4,7 +4,7 @@ import analyzers.IMorphAnalyzer;
 
 import datamodel.*;
 import factories.IMorphAnalyzerFactory;
-import helpers.DatasetConverter;
+import helpers.Datasets;
 
 import java.util.*;
 import java.util.function.Function;
@@ -42,7 +42,7 @@ public class RuleApplicabilityFactory implements IMorphAnalyzerFactory {
 
         // Collect all ending morphemes
         MorphemeExtractor me = new MorphemeExtractor(
-                DatasetConverter.collectMorphemes(words.get()));
+                Datasets.Converters.collectMorphemes(words.get()));
 
         // Generate rules and filter unpopular rules(is determined by minWordForRule)
         Set<LemmaRule> rules = generateRule(words.get(), minWordForRule);
@@ -118,7 +118,7 @@ public class RuleApplicabilityFactory implements IMorphAnalyzerFactory {
 
         for (IWord word : words) {
             // Form lemma rule for word
-            LemmaRule rule = DatasetConverter.getRuleFromWord(word);
+            LemmaRule rule = Datasets.Converters.getRuleFromWord(word);
             // Count rules
             countRules.merge(rule, 1, (a, b) -> ++a);
         }
@@ -141,7 +141,7 @@ public class RuleApplicabilityFactory implements IMorphAnalyzerFactory {
         return words.stream()
                 .collect(Collectors.toMap(
                         Function.identity(),
-                        DatasetConverter::extractMorphemes));
+                        Datasets.Converters::extractMorphemes));
     }
 
     /**

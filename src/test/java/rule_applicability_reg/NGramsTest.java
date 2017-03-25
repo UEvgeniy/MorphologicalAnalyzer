@@ -39,7 +39,6 @@ public class NGramsTest {
                     IllegalArgumentException.class,
                     () ->  NGrams.get(word, N)
             );
-            return;
         }
 
 

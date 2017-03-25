@@ -1,19 +1,19 @@
-package datamodel;
+package datamodel.properties;
 
+import java.io.Serializable;
 import java.util.*;
 
 /**
  * Morph properties in usual representation
  */
-public class MorphProperties implements IMorphProperties{
 
+// todo change implement methods
+public class RusCorporaProps implements IMorphProperties, Serializable{
+
+    private static final long serialVersionUID = -2218704355685995948L;
     private Set<String> properties;
 
-    public MorphProperties(Set<String> properties){
-        this.properties = properties;
-    }
-
-    MorphProperties(String properties){
+    public RusCorporaProps(String properties){
 
         String[] propsArray = properties.split("=");
         String usefulProps = propsArray.length > 1 ? propsArray[1] : "";
@@ -30,12 +30,10 @@ public class MorphProperties implements IMorphProperties{
         init(propsSet);
         */
 
-
-
     }
 
     /*
-    public MorphProperties(MorphProperties properties) {
+    public RusCorporaProps(RusCorporaProps properties) {
         this.properties = properties.get();
     }
     private void init(Set<PoS> props){
@@ -49,54 +47,15 @@ public class MorphProperties implements IMorphProperties{
     }
     */
 
-    @Override
-    public Set<String> get() {
-        return properties;
-    }
 
-    /*
-    enum PoS {
 
-        S("Сущ"), A("Прил"), V("Глаг");
-
-        private String value;
-
-        PoS(String value){
-            this.value = value;
-        }
-
-        String getValue(){
-            return value;
-        }
-
-        static Set<PoS> get(Collection<String> properties){
-            Set<PoS> result = new HashSet<>();
-
-            for (String property : properties) {
-                switch (property) {
-                    case "s":
-                        result.add(S);
-                        break;
-                    case "a":
-                        result.add(A);
-                        break;
-                    case "v":
-                        result.add(V);
-                        break;
-                }
-            }
-            return result;
-        }
-
-    }
-    */
 
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        MorphProperties that = (MorphProperties) o;
+        RusCorporaProps that = (RusCorporaProps) o;
         return Objects.equals(properties, that.properties);
     }
 
@@ -108,5 +67,15 @@ public class MorphProperties implements IMorphProperties{
     @Override
     public String toString() {
         return Arrays.toString(properties.toArray());
+    }
+
+    @Override
+    public PoS getPos() {
+        return null;
+    }
+
+    @Override
+    public Set<String> getProperties() {
+        return null;
     }
 }

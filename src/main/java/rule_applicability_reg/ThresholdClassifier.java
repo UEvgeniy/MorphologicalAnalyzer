@@ -2,8 +2,11 @@ package rule_applicability_reg;
 
 import datamodel.MorphemedWord;
 
-public class ThresholdClassifier implements IClassifier {
+import java.io.Serializable;
 
+public class ThresholdClassifier implements IClassifier, Serializable {
+
+	private static final long serialVersionUID = 505664909480649857L;
 	private final IClassifier classifier;
 	private final double threshold;
 	

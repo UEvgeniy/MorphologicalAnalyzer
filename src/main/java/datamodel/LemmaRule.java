@@ -1,5 +1,7 @@
 package datamodel;
 
+import datamodel.properties.IMorphProperties;
+
 import java.io.Serializable;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -31,7 +33,7 @@ public class LemmaRule implements ILemmaRule, Serializable{
     }
 
     public String getRemoved() {
-		return removed.stream().map(IMorpheme::getText).collect(Collectors.joining());
+		return removed.stream().map(IMorpheme::get).collect(Collectors.joining());
 	}
 
 	public void setRemoved(Collection<IMorpheme> removed) {
@@ -56,7 +58,7 @@ public class LemmaRule implements ILemmaRule, Serializable{
         List<IMorpheme> lemmaMorphemes = new ArrayList<>(word.getMorphemes());
 
         for (IMorpheme m : removed){
-            lemmaMorphemes.removeIf((morpheme) -> morpheme.getText().equals(m.getText()));
+            lemmaMorphemes.removeIf((morpheme) -> morpheme.get().equals(m.get()));
         }
 
         for (IMorpheme m : added){
@@ -69,8 +71,8 @@ public class LemmaRule implements ILemmaRule, Serializable{
     @Override
     public IWord apply(MorphemedWord word) {
         return new Word(
-                word.getWord(),
-                formLemma(word).getWord(),
+                word.get(),
+                formLemma(word).get(),
                 properties);
     }
 

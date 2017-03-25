@@ -1,6 +1,7 @@
 package rule_applicability_reg;
 
 import datamodel.*;
+import datamodel.properties.IMorphProperties;
 
 import java.io.Serializable;
 import java.util.*;
