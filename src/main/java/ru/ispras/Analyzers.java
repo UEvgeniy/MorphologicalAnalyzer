@@ -1,0 +1,120 @@
+package ru.ispras;
+
+import analyzers.IMorphAnalyzer;
+import aot_based.AotBasedFactory;
+import datamodel.IDataset;
+import libsvm.LibSVM;
+import net.sf.javaml.classification.Classifier;
+import net.sf.javaml.classification.bayes.NaiveBayesClassifier;
+import net.sf.javaml.core.Dataset;
+import rule_applicability_reg.*;
+
+import java.util.Random;
+import java.util.function.Function;
+
+/**
+ * Examples of functions that accepts one IDataset and produces IMorphAnalyzer.
+ */
+class Analyzers {
+
+    private Analyzers(){}
+
+    static Function<IDataset, IMorphAnalyzer> AOT(){
+        return (d) -> new AotBasedFactory(d).create();
+    }
+
+    static Function<IDataset, IMorphAnalyzer> BayesThreshold(int NGrams, double proportion){
+        return (d) -> {
+            IClassifierTrainer trainer =
+                    getThresholdTrainer(
+                            new NaiveBayesClassifier(false, false, true),
+                            NGrams,
+                            proportion);
+
+            RuleApplicabilityFactory fact = new RuleApplicabilityFactory(d, trainer);
+
+            return fact.create();
+        };
+    }
+
+    static Function<IDataset, IMorphAnalyzer> BayesBinClassifier(int NGrams){
+
+        return (d) -> {
+            IClassifierTrainer trainer = getBinClassifier(
+                    new NaiveBayesClassifier(false, false, true),
+                    NGrams
+            );
+
+            RuleApplicabilityFactory fact = new RuleApplicabilityFactory(d, trainer);
+
+            return fact.create();
+        };
+    }
+
+    static Function<IDataset, IMorphAnalyzer> SVMThreshold(int NGrams, double proportion){
+        return (d) -> {
+            IClassifierTrainer trainer =
+                    getThresholdTrainer(
+                            new LibSVM(),
+                            NGrams,
+                            proportion);
+
+            RuleApplicabilityFactory fact = new RuleApplicabilityFactory(d, trainer);
+
+            return fact.create();
+        };
+    }
+
+    static Function<IDataset, IMorphAnalyzer> SVMBinClassifier(int NGrams){
+
+        return (d) -> {
+            IClassifierTrainer trainer = getBinClassifier(
+                    new LibSVM(),
+                    NGrams
+            );
+
+            RuleApplicabilityFactory fact = new RuleApplicabilityFactory(d, trainer);
+
+            return fact.create();
+        };
+    }
+
+    // todo random forest
+
+
+    /**
+     * Produces Binary Classifier for RuleApplicabilityAnalyzer
+     * @param classifier Used classifier
+     * @param NGrams length of substrings
+     * @return Trainer
+     */
+    private static IClassifierTrainer getBinClassifier(Classifier classifier, int NGrams){
+
+        Function<Dataset, Classifier> classifierFunction = (d) ->
+        {
+            classifier.buildClassifier(d);
+            return classifier;
+        };
+
+        return new JavaMlClassifierTrainer(new NGrams(NGrams), classifierFunction);
+    }
+
+
+    /**
+     * Produces Regression (with threshold) Trainer for RuleApplicabilityAnalyzer
+     * @param classifier Used classifier
+     * @param NGrams length of substrings
+     * @param proportion proportion of splitting dataset to train and test
+     * @return Trainer
+     */
+    private static IClassifierTrainer getThresholdTrainer(
+            Classifier classifier, int NGrams, double proportion){
+
+        IClassifierTrainer wrapped = getBinClassifier(classifier, NGrams);
+
+        return new ThresholdClassifierTrainer(
+                wrapped,
+                proportion,
+                new Random(0));
+    }
+}

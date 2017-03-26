@@ -1,13 +1,10 @@
-package comparator;
+package quality_assess;
 
 import analyzers.IMorphAnalyzer;
 import datamodel.IDataset;
 import datamodel.IWord;
-import factories.IMorphAnalyzerFactory;
 
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.function.Function;
 
@@ -19,12 +16,10 @@ public class QualityAssessment {
 
     private final List<IMorphAnalyzer> analyzers;
 
-    private final Map<String, Set<IWord>> test;
-    private final IEvaluationCriteria criteria;
+    private IEvaluationCriteria criteria;
 
     public QualityAssessment(Collection<Function<IDataset, IMorphAnalyzer>> functions,
-                             IDataset train, IDataset test,
-                             IEvaluationCriteria criteria) {
+                             IDataset train) {
 
         analyzers = new ArrayList<>();
 
@@ -32,33 +27,34 @@ public class QualityAssessment {
         for (Function<IDataset, IMorphAnalyzer> func : functions){
             analyzers.add(func.apply(train));
         }
-
-        this.test = Objects.requireNonNull(formTestData(test));
-        this.criteria = Objects.requireNonNull(criteria);
     }
 
 
-    public Map<IMorphAnalyzer, QualityResult> start() {
+    public Map<IMorphAnalyzer, QualityResult> start(IDataset test, IEvaluationCriteria criteria) {
+
+        this.criteria = Objects.requireNonNull(criteria);
 
         Map<IMorphAnalyzer, QualityResult> res = new HashMap<>();
 
         for (IMorphAnalyzer analyzer : analyzers){
 
-            res.put(analyzer, getQuality(analyzer));
+            res.put(analyzer, getQuality(analyzer, test));
         }
 
         return res;
     }
 
-    private QualityResult getQuality(IMorphAnalyzer analyzer){
+    private QualityResult getQuality(IMorphAnalyzer analyzer, IDataset test){
+
+        Map<String, Set<IWord>> correct = formTestData(test);
 
         double result_precision = 0;
         double result_recall = 0;
         Set<IWord> difWords = new HashSet<>();
 
-        for (Map.Entry<String, Set<IWord>> entry : test.entrySet()){
+        for (Map.Entry<String, Set<IWord>> entry : correct.entrySet()){
 
-            QualityResult forWord = criteria.evaluate(
+            QualityResult forWord = evaluate(
                     analyzer.analyze(entry.getKey()),
                     entry.getValue());
 
@@ -67,8 +63,37 @@ public class QualityAssessment {
             difWords.addAll(forWord.getDifficultWords());
         }
 
-        return new QualityResult(result_precision / test.size(),
-                result_recall / test.size(), difWords);
+        return new QualityResult(result_precision / correct.size(),
+                result_recall / correct.size(), difWords);
+    }
+
+
+    private QualityResult evaluate(Set<IWord> predicted, Set<IWord> correct) {
+
+        if (predicted.isEmpty()){
+            return new QualityResult(0, 0, correct);
+        }
+
+        int counter = 0;
+
+        Set<IWord> difficultWords = new HashSet<>();
+
+        for (IWord pred : predicted){
+            for (IWord corr : correct) {
+                if (criteria.evaluate(pred, corr)){
+                    counter++;
+                }
+                else{
+                    difficultWords.add(corr);
+                }
+            }
+        }
+
+
+        return new QualityResult(
+                (double) counter / predicted.size(),
+                (double) counter / correct.size(),
+                difficultWords);
     }
 
 

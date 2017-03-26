@@ -2,7 +2,6 @@ package aot_based;
 
 import analyzers.IMorphAnalyzer;
 import datamodel.IDataset;
-import factories.IDatasetParser;
 import factories.IMorphAnalyzerFactory;
 
 import java.util.Objects;

@@ -1,21 +1,26 @@
 package ru.ispras;
 
 import analyzers.IMorphAnalyzer;
-import aot_based.AotBasedFactory;
+
 import datamodel.IDataset;
+import datamodel.IWord;
 import datamodel.properties.PoS;
-import factories.IMorphAnalyzerFactory;
+
 import helpers.Datasets;
 import helpers.Datasets.Filters;
-import net.sf.javaml.classification.Classifier;
-import net.sf.javaml.classification.bayes.NaiveBayesClassifier;
-import net.sf.javaml.core.Dataset;
+
 import parsers.DatasetParser;
 import parsers.IWordsExtractor;
 import parsers.Parsers;
-import rule_applicability_reg.*;
+
+import quality_assess.Comparators;
+import quality_assess.QualityAssessment;
+import quality_assess.QualityResult;
 
 import java.io.File;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.function.Function;
 
@@ -50,43 +55,37 @@ class Examples {
     }
 
 
-    static IMorphAnalyzer generateAnalyzer(IDataset dataset){
+    static Map<IMorphAnalyzer, QualityResult> assessQuality
+            (Collection<Function<IDataset, IMorphAnalyzer>> funcs, IDataset dataset){
 
-        // 1. AOT
-        IMorphAnalyzerFactory aotF = new AotBasedFactory(dataset);
-        IMorphAnalyzer aot =  aotF.create();
+        List<IDataset> splitted = dataset.split(99, new Random(42));
 
+        QualityAssessment assessment = new QualityAssessment(funcs, splitted.get(0));
 
-        // 2.1 Create Classifier and IClassifierTrainer
-        Classifier bayes = new NaiveBayesClassifier(false, false, true);
-        IClassifierTrainer trainer = getThresholdTrainer(bayes);
-        // 2.2 Factory
-        IMorphAnalyzerFactory ruleAppF = new RuleApplicabilityFactory(dataset, trainer);
-
-        // 2.2 Create rules applicability analyzer (bayes, threshold)
-        IMorphAnalyzer bayes_threshold = ruleAppF.create();
-
-        return bayes_threshold; // return aot;
+        return assessment.start(splitted.get(1).filter(Filters.byPoS(PoS.NOUN)), Comparators::byLemma);
     }
 
 
-    static IClassifierTrainer getThresholdTrainer(Classifier classifier){
+    /**
+     * Represents
+     * @param an analyzer
+     * @param words List of analyzed words
+     */
+    static void tryAnalyze(IMorphAnalyzer an, String... words) {
 
-        Function<Dataset, Classifier> classifierFunction = (d) ->
-        {
-            classifier.buildClassifier(d);
-            return classifier;
-        };
-
-        IClassifierTrainer wrapped = new JavaMlClassifierTrainer(
-                new NGrams(2),
-                classifierFunction
-        );
-
-        return new ThresholdClassifierTrainer(
-                wrapped,
-                0.8,
-                new Random(0));
+        for (String word : words) {
+            if (an.canHandle(word)) {
+                Collection<IWord> answers = an.analyze(word);
+                System.out.println("WORD: " + word);
+                for (IWord w : answers) {
+                    System.out.println("\tLEMMA: " + w.getLemma() + "\tPROPS: " + w.getProperties().toString());
+                }
+            } else {
+                System.out.println("Word " + word + "\n\tcannot be analyzed");
+            }
+        }
     }
+
+
 
 }
