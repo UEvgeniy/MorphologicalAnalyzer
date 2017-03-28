@@ -62,7 +62,7 @@ class Examples {
 
         QualityAssessment assessment = new QualityAssessment(funcs, splitted.get(0));
 
-        return assessment.start(splitted.get(1).filter(Filters.byPoS(PoS.NOUN)), Comparators::byLemma);
+        return assessment.start(splitted.get(1).filter(Filters.byPoS(PoS.NOUN)), Comparators::fullCoincidence);
     }
 
 

@@ -11,6 +11,7 @@ import rule_applicability_reg.*;
 
 import java.util.Random;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 /**
  * Examples of functions that accepts one IDataset and produces IMorphAnalyzer.
@@ -27,7 +28,7 @@ class Analyzers {
         return (d) -> {
             IClassifierTrainer trainer =
                     getThresholdTrainer(
-                            new NaiveBayesClassifier(false, false, true),
+                            () -> new NaiveBayesClassifier(false, false, true),
                             NGrams,
                             proportion);
 
@@ -41,7 +42,7 @@ class Analyzers {
 
         return (d) -> {
             IClassifierTrainer trainer = getBinClassifier(
-                    new NaiveBayesClassifier(false, false, true),
+                    () -> new NaiveBayesClassifier(false, false, true),
                     NGrams
             );
 
@@ -55,7 +56,7 @@ class Analyzers {
         return (d) -> {
             IClassifierTrainer trainer =
                     getThresholdTrainer(
-                            new LibSVM(),
+                            LibSVM::new,
                             NGrams,
                             proportion);
 
@@ -69,7 +70,7 @@ class Analyzers {
 
         return (d) -> {
             IClassifierTrainer trainer = getBinClassifier(
-                    new LibSVM(),
+                    LibSVM::new,
                     NGrams
             );
 
@@ -88,10 +89,11 @@ class Analyzers {
      * @param NGrams length of substrings
      * @return Trainer
      */
-    private static IClassifierTrainer getBinClassifier(Classifier classifier, int NGrams){
+    private static IClassifierTrainer getBinClassifier(Supplier<Classifier> constructor, int NGrams){
 
         Function<Dataset, Classifier> classifierFunction = (d) ->
         {
+            Classifier classifier = constructor.get();
             classifier.buildClassifier(d);
             return classifier;
         };
@@ -108,7 +110,7 @@ class Analyzers {
      * @return Trainer
      */
     private static IClassifierTrainer getThresholdTrainer(
-            Classifier classifier, int NGrams, double proportion){
+            Supplier<Classifier> classifier, int NGrams, double proportion){
 
         IClassifierTrainer wrapped = getBinClassifier(classifier, NGrams);
 

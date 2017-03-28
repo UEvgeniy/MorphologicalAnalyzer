@@ -22,15 +22,7 @@ public class JavaMLClassifier implements IClassifier, Serializable {
 	@Override
 	public boolean predict(MorphemedWord word) {
 		Instance instance = instanceFactory.apply(word);
-		Map<Object, Double> classDistribution= classifier.classDistribution(instance);
-		return getMostProbableClass(classDistribution);
-	}
-	
-	private boolean getMostProbableClass(Map<Object, Double> classDistribution) {
-		Object answer = classDistribution.entrySet().stream()
-				.max((e1, e2) -> (int)(e1.getValue() - e2.getValue())).get().getKey();
-
-		return answer != null && answer.equals("true");
+		return classifier.classify(instance).equals("true");
 	}
 
 	@Override

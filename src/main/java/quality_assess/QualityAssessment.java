@@ -7,6 +7,7 @@ import datamodel.IWord;
 
 import java.util.*;
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 
 /**
@@ -74,26 +75,42 @@ public class QualityAssessment {
             return new QualityResult(0, 0, correct);
         }
 
-        int counter = 0;
-
         Set<IWord> difficultWords = new HashSet<>();
+        int precision = 0;
+        int recall = 0;
 
-        for (IWord pred : predicted){
-            for (IWord corr : correct) {
-                if (criteria.evaluate(pred, corr)){
-                    counter++;
-                }
-                else{
-                    difficultWords.add(corr);
-                }
+        // Count Recall
+        for (IWord word: correct){
+            if (contains(predicted, word)){
+                recall++;
+            }
+            else {
+                difficultWords.add(word);
+            }
+        }
+
+        // Count Precision
+        for (IWord word: predicted){
+            if (contains(correct, word)){
+                precision++;
             }
         }
 
 
         return new QualityResult(
-                (double) counter / predicted.size(),
-                (double) counter / correct.size(),
+                (double) precision / predicted.size(),
+                (double) recall / correct.size(),
                 difficultWords);
+    }
+
+    private boolean contains(Set<IWord> set, IWord word){
+
+        for (IWord w: set){
+            if (criteria.evaluate(word, w)){
+                return true;
+            }
+        }
+        return false;
     }
 
 
