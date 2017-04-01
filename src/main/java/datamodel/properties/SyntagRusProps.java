@@ -58,7 +58,7 @@ public class SyntagRusProps implements IMorphProperties {
 
     private static Set<String> extractImportantProps(PoS pos, String[] props){
 
-        Set<String> result = new HashSet<>();
+        Set<String> result = new TreeSet<>();
 
         for (String s : props) {
 

@@ -31,4 +31,10 @@ public class JavaMLClassifier implements IClassifier, Serializable {
 		Map<Object, Double> classDistribution= classifier.classDistribution(instance);
 		return classDistribution.getOrDefault("true", 0.0);
 	}
+
+	@Override
+	public String getInfo() {
+		return this.getClass().getSimpleName() +
+				" [Classifier: " + classifier.getClass().getSimpleName() + "]";
+	}
 }

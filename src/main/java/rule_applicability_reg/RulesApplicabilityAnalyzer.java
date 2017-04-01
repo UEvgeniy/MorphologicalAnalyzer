@@ -17,6 +17,7 @@ public class RulesApplicabilityAnalyzer implements IMorphAnalyzer,Serializable {
     private final MorphemeExtractor morphemeExtractor;
     private Map<String, Set<ExtendedLemmaRule>> rules;
 
+
     /**
      * Constructor
      * @param morphemeExtractor a tool for extracting possible morphemes from String
@@ -61,5 +62,17 @@ public class RulesApplicabilityAnalyzer implements IMorphAnalyzer,Serializable {
     @Override
     public Boolean canHandle(String word) {
         return analyze(word) != null && analyze(word).size() > 0;
+    }
+
+    @Override
+    public String toString() {
+        String info;
+        try {
+            info = rules.values().iterator().next().iterator().next().getClassifierInfo();
+        }
+        catch (NullPointerException | NoSuchElementException e){
+            info = "";
+        }
+        return this.getClass().getSimpleName() + ": " + info;
     }
 }

@@ -42,6 +42,10 @@ class ExtendedLemmaRule implements ILemmaRule, Serializable {
         return rule.getMorphProperties();
     }
 
+    String getClassifierInfo(){
+        return classifier.getInfo();
+    }
+
 
 	@Override
 	public boolean equals(Object o) {

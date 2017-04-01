@@ -34,7 +34,7 @@ public class Parsers {
      * @param file List of files, where for parse
      * @return Collection of extracted tagged words
      */
-    public static Collection<IWord> RusCorpora(File file){
+    public static Set<IWord> RusCorpora(File file){
         String pattern =
                 "<w><ana lex=\"([^\"]+)\" gr=\"([^\"]+)\"></ana>([^<]+)</w>.*";
 
@@ -51,7 +51,7 @@ public class Parsers {
      * @param file List of files, where for parse
      * @return Collection of extracted tagged words
      */
-    public static Collection<IWord> SyntagRus(File file){
+    public static Set<IWord> SyntagRus(File file){
 
         String pattern = "\\d+\\s(?<word>[\\S]+)\\s(?<lemma>[\\S]+)\\s(?<props>.+)";
 
@@ -65,7 +65,7 @@ public class Parsers {
 
 
 
-    private static Collection<IWord> commonParser(File file,
+    private static Set<IWord> commonParser(File file,
                                                   String extension,
                                                   String pattern,
                                                   String charsetName,

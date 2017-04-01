@@ -6,6 +6,7 @@ import datamodel.IDataset;
 import libsvm.LibSVM;
 import net.sf.javaml.classification.Classifier;
 import net.sf.javaml.classification.bayes.NaiveBayesClassifier;
+import net.sf.javaml.classification.tree.RandomForest;
 import net.sf.javaml.core.Dataset;
 import rule_applicability_reg.*;
 
@@ -80,7 +81,18 @@ class Analyzers {
         };
     }
 
-    // todo random forest
+    static Function<IDataset, IMorphAnalyzer> RandomForestBinClassifier(int NGrams, int treecount){
+        return d -> {
+            IClassifierTrainer trainer = getBinClassifier(
+                    () -> new RandomForest(treecount),
+                    NGrams
+            );
+
+            RuleApplicabilityFactory fact = new RuleApplicabilityFactory(d, trainer);
+
+            return fact.create();
+        } ;
+    }
 
 
     /**

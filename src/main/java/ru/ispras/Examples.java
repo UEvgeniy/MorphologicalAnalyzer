@@ -58,11 +58,11 @@ class Examples {
     static Map<IMorphAnalyzer, QualityResult> assessQuality
             (Collection<Function<IDataset, IMorphAnalyzer>> funcs, IDataset dataset){
 
-        List<IDataset> splitted = dataset.split(99, new Random(42));
+        List<IDataset> splitted = dataset.split(95, new Random(2));
 
         QualityAssessment assessment = new QualityAssessment(funcs, splitted.get(0));
 
-        return assessment.start(splitted.get(1).filter(Filters.byPoS(PoS.NOUN)), Comparators::fullCoincidence);
+        return assessment.start(splitted.get(1), Comparators::fullCoincidence);
     }
 
 

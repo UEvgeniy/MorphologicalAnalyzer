@@ -7,4 +7,6 @@ public interface IClassifier {
 	boolean predict(MorphemedWord word);
 	
 	double getProbability(MorphemedWord word);
+
+	String getInfo();
 }

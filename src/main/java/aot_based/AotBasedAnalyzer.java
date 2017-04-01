@@ -79,4 +79,9 @@ public class AotBasedAnalyzer implements IMorphAnalyzer, Serializable {
     public Boolean canHandle(String word) {
         return analyze(word).size() >0;
     }
+
+    @Override
+    public String toString() {
+        return this.getClass().getSimpleName();
+    }
 }

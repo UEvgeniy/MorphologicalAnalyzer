@@ -25,4 +25,9 @@ public class ThresholdClassifier implements IClassifier, Serializable {
 		return classifier.getProbability(word);
 	}
 
+	@Override
+	public String getInfo() {
+		return this.getClass().getSimpleName() +
+				" [Classifier: " + classifier.getClass().getSimpleName() + "]";
+	}
 }
