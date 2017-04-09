@@ -6,11 +6,11 @@ import java.util.function.Predicate;
 /**
  * Class for storage tagged dictionary of IWords
  */
-public class DataSet implements  IDataset{
+public class Dataset implements  IDataset{
 
     private final Set<IWord> dictionary;
 
-    public DataSet(Set<IWord> dictionary){
+    public Dataset(Set<IWord> dictionary){
         this.dictionary = Objects.requireNonNull(dictionary,
                 "Set of words cannot be null");
     }
@@ -48,8 +48,8 @@ public class DataSet implements  IDataset{
 
         List<IDataset> result = new ArrayList<>();
 
-        result.add(new DataSet(train));
-        result.add(new DataSet(test));
+        result.add(new Dataset(train));
+        result.add(new Dataset(test));
 
         return result;
     }
@@ -68,7 +68,7 @@ public class DataSet implements  IDataset{
                 newDataset.add(word);
             }
         }
-        return new DataSet(newDataset);
+        return new Dataset(newDataset);
     }
 
     @Override
