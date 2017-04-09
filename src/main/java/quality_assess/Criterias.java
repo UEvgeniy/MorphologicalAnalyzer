@@ -5,9 +5,9 @@ import datamodel.IWord;
 /**
  * Class represents modes of comparing predicted and correct IWord
  */
-public class Comparators {
+public class Criterias {
 
-    private Comparators(){}
+    private Criterias(){}
 
     public static boolean byLemma(IWord one, IWord another){
         return one.getLemma().equals(another.getLemma());

@@ -37,11 +37,11 @@ public class QualityResult {
         StringBuilder res = new StringBuilder();
 
         if (info != Info.Recall) {
-            res.append("Precision: ").append(precision).append("\n");
+            res.append("Precision: ").append(round(precision, 2)).append("\n");
         }
 
         if (info != Info.Precision) {
-            res.append("Recall: ").append(recall).append("\n");
+            res.append("Recall: ").append(round(recall, 2)).append("\n");
         }
 
         if (info == Info.PrecisionRecallDiffWords) {
@@ -51,6 +51,13 @@ public class QualityResult {
             }
         }
         return res.toString();
+    }
+
+    private static double round(double val, int places){
+        if (places < 0)
+            throw new IllegalArgumentException();
+        double tmp = Math.pow(10, places);
+        return (double)Math.round(val * tmp) / tmp;
     }
 
     public enum Info{

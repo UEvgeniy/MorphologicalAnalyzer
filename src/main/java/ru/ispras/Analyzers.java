@@ -3,6 +3,9 @@ package ru.ispras;
 import analyzers.IMorphAnalyzer;
 import aot_based.AotBasedFactory;
 import datamodel.IDataset;
+import factories.IMorphAnalyzerFactory;
+import factories.MorphAnalyzerLoader;
+import factories.MorphAnalyzerSaver;
 import libsvm.LibSVM;
 import net.sf.javaml.classification.Classifier;
 import net.sf.javaml.classification.bayes.NaiveBayesClassifier;
@@ -10,6 +13,8 @@ import net.sf.javaml.classification.tree.RandomForest;
 import net.sf.javaml.core.Dataset;
 import rule_applicability_reg.*;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.Random;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -20,6 +25,26 @@ import java.util.function.Supplier;
 class Analyzers {
 
     private Analyzers(){}
+
+    static Function<IDataset, IMorphAnalyzer> save(IMorphAnalyzerFactory fact, File file){
+        return d -> {
+            try {
+                return new MorphAnalyzerSaver(fact, file).create();
+            } catch (IOException e) {
+                return null;
+            }
+        };
+    }
+
+    static Function<IDataset, IMorphAnalyzer> load(File file){
+        return d -> {
+            try {
+                return new MorphAnalyzerLoader(file).create();
+            } catch (IOException e) {
+                return null;
+            }
+        };
+    }
 
     static Function<IDataset, IMorphAnalyzer> AOT(){
         return (d) -> new AotBasedFactory(d).create();

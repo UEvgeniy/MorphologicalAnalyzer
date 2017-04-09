@@ -1,6 +1,6 @@
 package parsers;
 
-import datamodel.DataSet;
+import datamodel.Dataset;
 import datamodel.IDataset;
 import datamodel.IWord;
 import helpers.FileSearcher;
@@ -36,6 +36,6 @@ public class DatasetParser {
             );
         }
 
-        return new DataSet(words);
+        return new Dataset(words);
     }
 }

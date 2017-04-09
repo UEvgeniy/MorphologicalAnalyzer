@@ -5,7 +5,6 @@ import datamodel.*;
 
 import java.io.Serializable;
 import java.util.*;
-import java.util.stream.Collectors;
 
 
 /**
@@ -61,7 +60,7 @@ public class RulesApplicabilityAnalyzer implements IMorphAnalyzer,Serializable {
 
     @Override
     public Boolean canHandle(String word) {
-        return analyze(word) != null && analyze(word).size() > 0;
+        return true; /*analyze(word) != null && analyze(word).size() > 0;*/
     }
 
     @Override

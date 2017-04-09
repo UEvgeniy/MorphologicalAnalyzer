@@ -13,7 +13,7 @@ import parsers.DatasetParser;
 import parsers.IWordsExtractor;
 import parsers.Parsers;
 
-import quality_assess.Comparators;
+import quality_assess.Criterias;
 import quality_assess.QualityAssessment;
 import quality_assess.QualityResult;
 
@@ -54,15 +54,37 @@ class Examples {
         return dataset;
     }
 
+    static void showAssessRes(Map<IMorphAnalyzer, QualityResult> results){
+        for (Map.Entry<IMorphAnalyzer, QualityResult> res : results.entrySet()) {
+            System.out.println(res.getKey().toString());
+            System.out.println(res.getValue().getInfo(QualityResult.Info.PrecisionRecall));
+        }
+    }
+
 
     static Map<IMorphAnalyzer, QualityResult> assessQuality
             (Collection<Function<IDataset, IMorphAnalyzer>> funcs, IDataset dataset){
 
-        List<IDataset> splitted = dataset.split(95, new Random(2));
+        List<IDataset> splitted = dataset.split(90, new Random());
 
         QualityAssessment assessment = new QualityAssessment(funcs, splitted.get(0));
 
-        return assessment.start(splitted.get(1), Comparators::fullCoincidence);
+        return assessment.start(splitted.get(1), Criterias::byLemma);
+    }
+
+    static void assessQualityForeachPOS
+            (Collection<Function<IDataset, IMorphAnalyzer>> funcs, IDataset dataset, PoS... p){
+
+        List<IDataset> splitted = dataset.split(90, new Random());
+
+        QualityAssessment assessment = new QualityAssessment(funcs, splitted.get(0));
+
+        for (PoS pos: p) {
+            System.out.println(pos);
+            showAssessRes(assessment.start(
+                    splitted.get(1).filter(Filters.byPoS(pos)),
+                    Criterias::byLemma));
+        }
     }
 
 
@@ -84,6 +106,14 @@ class Examples {
                 System.out.println("Word " + word + "\n\tcannot be analyzed");
             }
         }
+    }
+
+    static void printNumberPOSInfo(IDataset dataset, PoS... pos){
+        for (PoS p: pos){
+            System.out.println(p + ": " + dataset.filter(Filters.byPoS(p)).size());
+        }
+        System.out.println("-----------");
+        System.out.print("Total: " + dataset.filter(Filters.byPoS(pos)).size());
     }
 
 
